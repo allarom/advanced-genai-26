@@ -1,0 +1,13 @@
+numpy
+pandas
+pytrec_eval
+langchain-core
+langchain-community
+langchain-huggingface
+chromadb
+rank-bm25
+langdetect
+nltk
+torch
+transformers
+sentence-transformers

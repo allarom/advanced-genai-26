@@ -178,6 +178,39 @@ pip install openai pydantic python-dotenv
      └── ...
      ```
 
+## Baseline Reproduction (Course Report)
+
+For the baseline-only reproduction (BM25, Dense, GraphRAG, Hybrid, Re-ranking),
+use the local runner and notebook:
+
+- `Baseline_Reproduction.ipynb`
+- `baseline_repro_runner.py`
+
+Install dependencies:
+
+```bash
+pip install -r baseline_repro_requirements.txt
+```
+
+Inspect required assets before running:
+
+```bash
+python baseline_repro_runner.py --root data --inspect-only
+```
+
+Run all five baseline methods with shared evaluation (`Precision@k`, `Recall@k`, `MRR`):
+
+```bash
+python baseline_repro_runner.py --root data --k-values 1,3,5,10 --top-n 100
+```
+
+Outputs are written to `results/baseline_repro/`:
+
+- `inspection.json`
+- `runs.json`
+- `metrics_per_query.csv`
+- `metrics_summary.csv`
+
 ## 📖 Workflow
 
 ### Step 1: Document Processing
@@ -439,4 +472,3 @@ This project is an assignment for Course: Advanced Generative AI at IDS-HSLU
 ---
 
 **Note**: This project is designed to run in Google Colab. Adjust paths and configurations for local execution.
-

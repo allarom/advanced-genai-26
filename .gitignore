@@ -1,2 +1,12 @@
 .DS_Store
 .venv
+__pycache__/
+*.pyc
+
+# Large/generated baseline artifacts (do not commit)
+baseline/advanced_genAI-main/data/
+baseline/advanced_genAI-main/results/
+
+# Local vector DB / index files
+*.sqlite3
+*.bin
