@@ -27,7 +27,7 @@ Person A and Person B work **in parallel** from Week 1. This is possible because
 | Week | Person A | Person B | Person C |
 |------|----------|----------|----------|
 | **Day 1** | All three: agree on agent interfaces (see below) | | |
-| **Week 1-2** | Build Agent Classes (Query Understanding, Fusion, Re-Ranker, Answer Synth, Critic) | Build 2-3 Orchestration Strategies using Step 1 retrievers as stand-ins | Set up evaluation pipeline, start visualizations |
+| **Week 1-2** | Build Agent Classes (Query Understanding, Fusion, Re-Ranker, Answer Synth, Critic) | **Dongyuan:** Branch A orchestration strategy implementation (primary) + optional evaluation support this week | **Julia:** Branch B orchestration strategy implementation (primary), then evaluation setup/visualization |
 | **Week 2 end** | Integration checkpoint: swap real agents into orchestration code | | |
 | **Week 3** | Support + bug fixes | Support + bug fixes | Run full quantitative evaluation (P@k, Recall, MRR) |
 | **Week 4** | Bonus: Explainability | Bonus: Adaptive RL | Qualitative eval (failure analysis, complementarity) |
@@ -60,10 +60,18 @@ Person B writes orchestration code calling these exact signatures. Person A buil
 | Role | Scope | Why |
 |------|-------|-----|
 | **Person A** | Agent Classes (Query Understanding, Fusion, Re-Ranker, Answer Synth, Critic) | Builds the modular building blocks |
-| **Person B** | Orchestration Strategies (Parallel, Confidence, Critic Loop) | Wires agents into workflows using Step 1 stand-ins first |
-| **Person C** | Evaluation Pipeline + Visualizations + Report Writing | Measures everything and writes it up |
+| **Person B (Dongyuan)** | Orchestration Strategy in Branch A + optional evaluation support this week | Wires agents into one strategy workflow and can help unblock early evaluation |
+| **Person C (Julia)** | Orchestration Strategy in Branch B + Evaluation Pipeline + Visualizations + Report Writing | Implements second strategy in parallel, then leads formal evaluation and reporting |
 
 All three collaborate during integration (end of Week 2) and report writing (Week 5).
+
+Working mode note: Dongyuan and Julia implement different orchestration strategies on separate branches, then compare and merge the best parts at integration.
+
+Branch/notebook workflow (recommended):
+- Use **two separate branches** (one per person/strategy), not one shared branch.
+- Use **two separate notebooks** (one per strategy), both copied from the same Step 2 base.
+- Keep setup/retriever/agent sections aligned in both notebooks, and change only orchestration/evaluation blocks.
+- Merge strategy results and the best logic at the Week 2 integration checkpoint.
 
 ---
 
