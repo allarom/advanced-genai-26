@@ -67,6 +67,12 @@ All three collaborate during integration (end of Week 2) and report writing (Wee
 
 Working mode note: Dongyuan and Julia implement different orchestration strategies on separate branches, then compare and merge the best parts at integration.
 
+Branch/notebook workflow (recommended):
+- Use **two separate branches** (one per person/strategy), not one shared branch.
+- Use **two separate notebooks** (one per strategy), both copied from the same Step 2 base.
+- Keep setup/retriever/agent sections aligned in both notebooks, and change only orchestration/evaluation blocks.
+- Merge strategy results and the best logic at the Week 2 integration checkpoint.
+
 ---
 
 ## Weeks 1-2: Build Agents (Person A) + Orchestration (Person B) in Parallel
