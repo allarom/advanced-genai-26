@@ -3,6 +3,9 @@
 __pycache__/
 *.pyc
 
+# Scripts folder (utility tools + extracted content; not project deliverables)
+scripts/
+
 # Large/generated baseline artifacts (do not commit)
 baseline/advanced_genAI-main/data/
 baseline/advanced_genAI-main/results/
