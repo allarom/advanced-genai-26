@@ -1,6 +1,91 @@
 {
- "verified_answers": {},
- "strategy_stats": {},
- "weight_memory": {},
- "failure_log": []
+  "verified_answers": {
+    "erc eth grants received": {
+      "query": "Who received ERC grants at ETH?",
+      "answer": "(verified) Several ETH researchers received ERC grants.",
+      "source": "human",
+      "ts": "2026-05-29 22:59:53"
+    },
+    "eth innovation support": {
+      "query": "How does ETH support innovation?",
+      "answer": "they support projects in which a minimum of three researchers from different eth departments or groups participate. eth and ubs intend to support this noteworthy expansion of the existing entrepreneurship eco-system, both with in-person offerings and on digital channels. ai-related entrepreneurial training forms part of a broad range of training and support for innovative talent that eth and the eth foundation have systematically expanded in recent years, such as the [student project house](https://ethz.ch/en/the-eth-zurich/education/sph.html), the [innovation &amp; entrepreneurship lab](https://ethz.ch/en/industry/entrepreneurs/ielab.html), the [external page pioneer fellowships call_made](https://ethz-foundation.ch/en/pioneer-fellows/) and the [spin-off support from eth transfer](https://ethz.ch/en/industry/entrepreneurs/spinoff.html).",
+      "source": "human",
+      "ts": "2026-05-29 22:59:53"
+    },
+    "areas eth important research zurich": {
+      "query": "What research areas are important at ETH Zurich?",
+      "answer": "eth zurich promotes data science research: ethz.ch/research/research_areas/information_and_communication.html). surgent hochschulmedizin zurich: aims to foster cooperation between the university of zurich, eth zurich and the university's hospitals in the overlapping areas of biomedical basic science, the natural sciences, engineering science, clinical research and healthcare. his research connects with topics that are already being studied at eth zurich, as well as with new areas of research in the field of high volume data processing and social networks.",
+      "source": "human",
+      "ts": "2026-05-29 22:59:53"
+    }
+  },
+  "strategy_stats": {
+    "entity": {
+      "confidence": {
+        "success": 5,
+        "fail": 0
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "mixed": {
+      "confidence": {
+        "success": 1,
+        "fail": 0
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "semantic": {
+      "confidence": {
+        "success": 1,
+        "fail": 0
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    }
+  },
+  "weight_memory": {
+    "entity": {
+      "bm25": 1.4,
+      "dense": 1.6,
+      "graph": 1.6
+    },
+    "mixed": {
+      "bm25": 1.1,
+      "dense": 1.3,
+      "graph": 0.9
+    },
+    "semantic": {
+      "bm25": 0.9,
+      "dense": 1.5,
+      "graph": 1.0
+    }
+  },
+  "failure_log": [
+    {
+      "query": "Who received ERC grants at ETH?",
+      "query_type": "entity",
+      "reason": "contradiction",
+      "ts": "2026-05-29 22:51:53"
+    }
+  ]
 }
