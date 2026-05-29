@@ -335,22 +335,24 @@ This mirrors the old CriticAgent's "broaden retrieval" retry, but at the orchest
 
 The complete Step 3 notebook was executed end-to-end on Google Colab using the `dongy` branch. The benchmark loop ran over all 24 evaluation queries with `strategy="confidence"` (default).
 
-**Decision distribution (20 queries reported; see screenshots):**
+**Decision distribution (all 24 queries):**
 
 | Decision | Count | Trust (mean) | Runtime (mean) | Notes |
 |----------|-------|--------------|----------------|-------|
-| **answer** | 10 | 0.617 | 0.314 s | First-pass or recovered successfully |
-| **abstain** | 7 | 0.188 | 0.500 s | Recovery attempted but still below threshold |
+| **answer** | 12 | 0.608 | 0.271 s | First-pass or recovered successfully |
+| **abstain** | 9 | 0.158 | 0.424 s | Recovery attempted but still below threshold |
 | **clarify** | 3 | 0.000 | ~0 s | Query too ambiguous; no retrieval performed |
+
+![Decision value counts](archived_documents/screenshots/03_decision_counts.png)
 
 ![Benchmark decision table](archived_documents/screenshots/01_benchmark_table.png)
 
 **Key observations:**
 
 1. **Recovery is demonstrably active.** Every `abstain` entry shows `retry_count: 1` and `strategy: voting`, confirming the pipeline switched strategy before giving up.
-2. **Trust scores are well-calibrated.** Answered queries average 0.617 trust; abstained queries average 0.188 — a clean separation.
+2. **Trust scores are well-calibrated.** Answered queries average 0.608 trust; abstained queries average 0.158 — a clean separation.
 3. **Clarification is instant.** "what is e-sling?" and similar vague queries trigger clarification in microseconds with zero trust.
-4. **Runtime pattern is intuitive.** Abstentions are slowest (~0.5 s) because they pay the cost of two retrievals (original + recovery). Answers are faster (~0.31 s). Clarifications are essentially free.
+4. **Runtime pattern is intuitive.** Abstentions are slowest (~0.42 s) because they pay the cost of two retrievals (original + recovery). Answers are faster (~0.27 s). Clarifications are essentially free.
 
 ![Grouped means by decision](archived_documents/screenshots/02_grouped_means.png)
 
@@ -424,7 +426,7 @@ We successfully:
 2. **Implemented** three orchestration strategies, selecting Confidence as the default (MRR 0.209).
 3. **Designed** a reliability layer with 8 specialized agents, a deterministic decision policy, and a unified trace schema.
 4. **Integrated** the reliability layer with the legacy engine via `%run` and wrapper functions.
-5. **Benchmarked** the full system on Google Colab (29 May 2026): 10 answered, 7 abstained, 3 clarified out of 24 queries, with demonstrable recovery behaviour and well-calibrated trust scores.
+5. **Benchmarked** the full system on Google Colab (29 May 2026): 12 answered, 9 abstained, 3 clarified out of 24 queries, with demonstrable recovery behaviour and well-calibrated trust scores.
 6. **Added** ablation support, retry-aware reasoning, and temporal coherence restoration.
 
 The architecture separates **retrieval** (produces candidates) from **reliability judgment** (decides whether to answer). This matches production patterns at major AI labs and provides a clean upgrade path from heuristics to LLM-based verification.
