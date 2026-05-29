@@ -22,10 +22,12 @@ User Query --> Clarify? --> Retrieve --> Check Signals --> Trust Score --> [Reco
 | `multi-agent-step-2_strategy-A.ipynb` | Legacy Step 2: retrieval engine (Confidence/Waterfall/Voting) |
 | `Step_2_Reliability_Aware_Design.ipynb` | Design doc: architecture, signals, decision policy, trace schema |
 | `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb` | Implementation: 8 reliability agents + `ReliableAdaptiveRAG` |
+| `Step_4.1_extra_challenges.ipynb` | Bonus: memory-based adaptation + human-in-the-loop |
 | `Step_1_Baseline_and_Failure_Analysis.ipynb` | Baseline reproduction and failure analysis |
 | `baseline_repro_report.md` | Baseline evaluation results |
 | `report.md` | Full project report with diagrams and analysis |
 | `scripts/` | Patch utilities and test scripts |
+| `memory/` | Persisted learned weights and verified answers |
 
 ---
 
@@ -71,11 +73,24 @@ rag = ReliableAdaptiveRAG(ablate=["contradiction", "critic"])
 result = rag.run("Did ETH funding increase?", strategy="confidence")
 ```
 
+### 5. Run memory-augmented system with human feedback (Step 4.1)
+
+Open `Step_4.1_extra_challenges.ipynb`.
+- Cell 1 loads Step 3 via `%run Step_3_Reliable_Adaptive_Agentic_RAG.ipynb`.
+- Run the `MemoryStore`, `classify_query_type`, and `MemoryAugmentedRAG` cells.
+- Use the feedback UI to rate answers; memory learns per query type.
+
+```python
+# After running the Step 4.1 notebook cells, feedback_ui is available:
+feedback_ui("Who received ERC grants at ETH?")
+# Click Good / Bad / Fix -- feedback is saved to memory/step4_memory.json
+```
+
 ---
 
 ## Architecture Overview
 
-The system wraps a proven retrieval engine with 8 reliability agents:
+The system wraps a proven retrieval engine with 8 reliability agents, plus memory and human feedback in Step 4.1:
 
 | Layer | Agents | Role |
 |-------|--------|------|
@@ -85,6 +100,8 @@ The system wraps a proven retrieval engine with 8 reliability agents:
 | **Scoring** | `TrustAgent` | Combine signals into [0,1] score |
 | **Decision** | `AbstentionAgent`, `RecoveryAgent` | Decide: abstain, retry, or answer |
 | **Feedback** | `CriticAgent` | Human-readable quality notes |
+| **Memory** | `MemoryStore` | Verified-answer cache + learned weights per query type |
+| **HITL** | `feedback_ui()` | Human feedback buttons (Good/Bad/Fix) |
 
 ---
 
@@ -96,6 +113,8 @@ The system wraps a proven retrieval engine with 8 reliability agents:
 | Best orchestration (full corpus) | Confidence MRR = 0.209 |
 | Trust threshold | 0.4 (abstain if below) |
 | Recovery actions | switch_strategy, rewrite_query, none |
+| Memory strategies learned | confidence, waterfall, voting per query_type |
+| Weight learning | confidence-only, clamped [0.3, 1.6] |
 
 ---
 
@@ -114,4 +133,6 @@ The system wraps a proven retrieval engine with 8 reliability agents:
 - All reliability checks use lightweight heuristics (token overlap, keyword matching).
 - Answer generation is extractive, not generative.
 - Trust score weights (`0.6*sufficiency + 0.3*groundedness - 0.4*contradiction`) are hand-tuned, not learned.
-- See `report.md` section 6 for full upgrade paths.
+- Memory weight learning is confidence-only; waterfall/voting are not weight-tunable.
+- Weight credit assignment is coarse (all retrievers nudged equally on feedback).
+- See `report.md` section 7 for full upgrade paths.

@@ -5,7 +5,7 @@ output:
 ---
 
 # Reliable Adaptive Agentic RAG System
-## Steps 1-3 Report | Advanced Generative AI Capstone
+## Steps 1-3 + Step 4.1 Bonus | Advanced Generative AI Capstone
 
 **Date:** May 2026 (Step 3 benchmark: 29 May 2026)
 
@@ -13,14 +13,15 @@ output:
 
 ## Executive Summary
 
-This report documents the design, implementation, and evaluation of a **Reliable Adaptive Agentic RAG system** built on top of a high-performing baseline retrieval pipeline. The project progresses through four logical stages:
+This report documents the design, implementation, and evaluation of a **Reliable Adaptive Agentic RAG system** built on top of a high-performing baseline retrieval pipeline. The project progresses through five logical stages:
 
 1. **Baseline Reproduction** — Reproduce and verify BM25, Dense, GraphRAG, Hybrid, and ReRank methods.
 2. **Multi-Agent Retrieval (Legacy Step 2)** — Implement and compare orchestration strategies (Confidence, Waterfall, Voting).
 3. **Reliability-Aware Design (New Step 2)** — Design architecture for evidence sufficiency, groundedness, contradiction detection, trust scoring, and adaptive recovery.
 4. **Reliable Adaptive Implementation (Step 3)** — Code 8 reliability agents that wrap the legacy retrieval engine.
+5. **Memory & Human-in-the-Loop (Step 4.1)** — Bonus: persistent memory that learns from feedback and a human feedback interface.
 
-The core insight: **retrieval quality is necessary but not sufficient for trustworthy answers.** We wrap the best-performing orchestration strategy (Confidence, MRR ~0.209) with a reliability layer that decides when to answer, abstain, recover, or clarify.
+The core insight: **retrieval quality is necessary but not sufficient for trustworthy answers.** We wrap the best-performing orchestration strategy (Confidence, MRR ~0.209) with a reliability layer that decides when to answer, abstain, recover, or clarify. Step 4.1 adds a memory layer that remembers what worked and a human feedback loop that turns corrections into learned improvements.
 
 ---
 
@@ -391,7 +392,66 @@ This isolates the true impact of each check on the final decision.
 
 ---
 
-## 6. Limitations & Future Work
+## 6. Extra Challenges: Memory-Based Adaptation & Human-in-the-Loop (Step 4.1)
+
+### 6.1 What was built
+
+Step 4.1 targets bonus challenges **#4 (Memory-Based Adaptation)** and **#3 (Human-in-the-Loop)**, with partial coverage of **#1 (Learning-based orchestration)**.
+
+| Component | Purpose |
+|-----------|---------|
+| **M1 Verified-Answer Cache** | Exact-signature matching serves human-confirmed answers instantly |
+| **M2 Strategy & Weight Memory** | Per-`query_type` counters learn which strategy works best; retriever weights tuned for confidence strategy only |
+| **M2.5 Rule-Based Reflection** | Reads failure log and suggests `waterfall` on insufficiency, `voting` on contradiction |
+| **M3 Gemini Reflection (optional)** | Smarter query rewriting when `USE_LLM_REFLECTION=True` and a `GOOGLE_API_KEY` is set |
+| **HITL UI** | 3-control panel (Good / Bad / Fix) with decision-aware meaning |
+
+### 6.2 Architecture
+
+```
+User Query
+    |
+    v
++--------------------------------+
+| MemoryAugmentedRAG (wrapper)   |
+|  1. Cache hit? -> serve now     |
+|  2. Pick best strategy (memory) |
+|  3. Swap learned weights (conf) |
+|  4. Reflect on recovery         |
+|  5. Run Step 3, log outcome     |
++--------------------------------+
+    |
+    v
++--------------------------------+
+|  ReliableAdaptiveRAG (Step 3)   |
+|  8 reliability agents           |
++--------------------------------+
+    |
+    v
++--------------------------------+
+|  Human feedback (Good/Bad/Fix)  |
+|  -> writes to memory JSON       |
++--------------------------------+
+```
+
+### 6.3 Key design decisions
+
+- **Composition over inheritance** -- `MemoryAugmentedRAG` wraps a `ReliableAdaptiveRAG` instance rather than subclassing it. This avoids coupling to `super().run()` signatures and keeps the injection explicit.
+- **Confidence-only weight learning** -- Step 2's Waterfall hardcodes tier weights and Voting uses equal weights, so memory only influences *strategy selection* for them. Weight nudging applies only to the Confidence orchestrator.
+- **No global mutation** -- Weights are injected by temporarily swapping the orchestrator's `weight_presets` attribute inside a `try/finally` block. The global `WEIGHT_PRESETS` dict is never modified.
+- **Exact-signature cache** -- Stopword-stripped, sorted-token signatures prevent "what is X" from matching "what is Y", while "ETH grants who" matches "who grants ETH".
+- **Coarse but robust credit assignment** -- A "Bad" vote nudges all three retriever weights equally. This is documented as a limitation, not fine-grained per-retriever learning.
+
+### 6.4 Status
+
+- **Implementation:** Complete. `MemoryStore`, `MemoryAugmentedRAG`, `feedback_ui`, and `GeminiReflectionAgent` are all implemented and unit-tested (15/15 tests pass).
+- **Dependencies:** `ipywidgets` for the feedback UI; `google-generativeai` only if `USE_LLM_REFLECTION=True`.
+- **Colab integration:** In progress. The `%run` chain (Step 4 -> Step 3 -> Step 2) works locally but requires careful filesystem handling in Colab due to temporary runtime storage.
+- **Memory persistence:** `memory/step4_memory.json` is created on first save and designed to be committed to git so learned state survives across sessions.
+
+---
+
+## 7. Limitations & Future Work
 
 ### Evidence Sufficiency
 - **Current:** Token overlap between query and top-5 docs.
@@ -409,6 +469,10 @@ This isolates the true impact of each check on the final decision.
 - **Current:** Hand-tuned linear formula `0.6*s + 0.3*g - 0.4*c`.
 - **Upgrade:** Calibration on labeled data or learned weights.
 
+### Memory & Learning
+- **Current:** Counter-based strategy selection and equal nudge on all retriever weights.
+- **Upgrade:** Contextual bandit for strategy selection; per-retriever provenance tracking for precise credit assignment.
+
 ### Clarification
 - **Current:** Pronoun and length heuristic.
 - **Upgrade:** LLM for entity disambiguation and intent clarification.
@@ -419,7 +483,7 @@ This isolates the true impact of each check on the final decision.
 
 ---
 
-## 7. Conclusion
+## 8. Conclusion
 
 We successfully:
 1. **Reproduced** the baseline and confirmed GraphRAG as the best single retriever (MRR 0.233).
@@ -428,6 +492,7 @@ We successfully:
 4. **Integrated** the reliability layer with the legacy engine via `%run` and wrapper functions.
 5. **Benchmarked** the full system on Google Colab (29 May 2026): 12 answered, 9 abstained, 3 clarified out of 24 queries, with demonstrable recovery behaviour and well-calibrated trust scores.
 6. **Added** ablation support, retry-aware reasoning, and temporal coherence restoration.
+7. **Built** Step 4.1 bonus system: persistent memory that learns from human feedback, a 3-control HITL interface, and an optional Gemini reflection agent for smarter query rewriting.
 
 The architecture separates **retrieval** (produces candidates) from **reliability judgment** (decides whether to answer). This matches production patterns at major AI labs and provides a clean upgrade path from heuristics to LLM-based verification.
 
@@ -442,11 +507,16 @@ advanced-genai-26/
 ├── multi-agent-step-2_strategy-A.ipynb   # Legacy Step 2 (retrieval engine)
 ├── Step_2_Reliability_Aware_Design.ipynb   # New Step 2 (design document)
 ├── Step_3_Reliable_Adaptive_Agentic_RAG.ipynb  # Step 3 (implementation)
+├── Step_4.1_extra_challenges.ipynb         # Step 4.1 bonus (memory + HITL)
+├── memory/                                 # Persisted learned state
 ├── scripts/                          # Patch and test utilities
 │   ├── extract_pdf.py
 │   ├── patch_step3_run.py
 │   ├── fix_recovery_flow.py
-│   └── test_recovery_flow.py
+│   ├── test_recovery_flow.py
+│   ├── build_step4_notebook.py
+│   ├── test_step4_memory.py
+│   └── validate_step4_notebook.py
 └── report.md                         # This report
 ```
 
@@ -470,8 +540,9 @@ This report and the accompanying code documentation were developed with assistan
 
 - **Explaining existing code**: Clarifying how the legacy Step 2 orchestration and CriticAgent work.
 - **Architecture visualization**: Creating ASCII flowcharts to explain agent interactions and the decision policy.
-- **Code review and debugging**: Identifying bugs (e.g., RecoveryAgent running at wrong time, missing `query_type` threading, over-escaped regex) and suggesting fixes.
+- **Code review and debugging**: Identifying bugs (e.g., RecoveryAgent running at wrong time, missing `query_type` threading, over-escaped regex, coarse weight nudge, M2.5 reason substring mismatch) and suggesting fixes.
 - **Documentation drafting**: Structuring and writing this report and the README.md based on the actual codebase.
-- **Design reasoning**: Discussing trade-offs (heuristics vs. LLMs, agent separation vs. merging, ablation defaults).
+- **Design reasoning**: Discussing trade-offs (heuristics vs. LLMs, agent separation vs. merging, ablation defaults, composition vs. inheritance for memory injection).
+- **Step 4.1 planning and review**: Designing the memory schema, HITL interface, learning rules, and integration risks across three review rounds.
 
 All code changes were reviewed and accepted by the authors. The AI did not have access to private data or external APIs beyond the project's own files. The core algorithms, design decisions, and evaluation results are the authors' own work.
