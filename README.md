@@ -24,9 +24,6 @@ User Query --> Clarify? --> Retrieve --> Check Signals --> Trust Score --> [Reco
 | `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb` | Implementation: 8 reliability agents + `ReliableAdaptiveRAG` |
 | `Step_4.1_extra_challenges.ipynb` | Bonus: memory-based adaptation + human-in-the-loop |
 | `Step_1_Baseline_and_Failure_Analysis.ipynb` | Baseline reproduction and failure analysis |
-| `scripts/generate_step1_deliverables.py` | Generates updated Step 1 deliverables (efficiency + taxonomy) from run CSV |
-| `step1_updated_deliverables.md` | Auto-generated Step 1 deliverable summary for updated requirements |
-| `cross_step_alignment.md` | Canonical alignment rules so Step 2/3/4 stay consistent with Step 1 baseline |
 | `baseline_repro_report.md` | Baseline evaluation results |
 | `report.md` | Full project report with diagrams and analysis |
 | `scripts/` | Patch utilities and test scripts |
@@ -50,14 +47,6 @@ Open `multi-agent-step-2_strategy-A.ipynb` in Google Colab or Jupyter.
 - Mount Google Drive with `benchmark/` and `storage/` data.
 - Set `HF_TOKEN` in Colab secrets (optional, for Hugging Face downloads).
 - Run all cells to reproduce baseline + orchestration results.
-
-To regenerate the updated Step 1 deliverable summary:
-
-```bash
-python3 scripts/generate_step1_deliverables.py \
-  --input 2026-05-29_22-44-32_output_step3.csv \
-  --output step1_updated_deliverables.md
-```
 
 ### 3. Run reliability-augmented system (Step 3)
 
