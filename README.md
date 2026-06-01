@@ -86,6 +86,8 @@ feedback_ui("Who received ERC grants at ETH?")
 # Click Good / Bad / Fix -- feedback is saved to memory/step4_memory.json
 ```
 
+- **Evaluation:** Section 12 of the notebook contains a 6-phase evaluation framework that compares cold vs warm memory, exports a CSV, and runs an ablation study.
+
 ---
 
 ## Architecture Overview

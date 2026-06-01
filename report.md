@@ -449,6 +449,28 @@ User Query
 - **Colab integration:** In progress. The `%run` chain (Step 4 -> Step 3 -> Step 2) works locally but requires careful filesystem handling in Colab due to temporary runtime storage.
 - **Memory persistence:** `memory/step4_memory.json` is created on first save and designed to be committed to git so learned state survives across sessions.
 
+### 6.5 Evaluation Framework
+
+We evaluate Step 4.1 with **reliability-oriented metrics**, not retrieval MRR, because memory does not change the underlying retrievers. Instead we measure decision quality, cache effectiveness, and learning behaviour.
+
+The 6-phase framework (implemented in Section 12 of the notebook):
+
+| Phase | What | Purpose |
+|-------|------|---------|
+| **0** | Reuse existing Step 3 CSV (`*_output_step3.csv`) | True baseline from plain `ReliableAdaptiveRAG` |
+| **1** | Run `smart_rag` with an empty `MemoryStore` | Isolate the memory wrapper's overhead before learning |
+| **2** | Define 10 new challenging queries across 5 categories | Extend benchmark for reliability testing (no qrels) |
+| **3** | HITL feedback session (Good / Bad / Fix) | Populate memory with verified answers, strategy stats, and weights |
+| **4** | Re-run queries with **warm memory** | Show cache hits, possible strategy switches, trust changes |
+| **5** | Before/after CSV diff + ablation study | Quantify what each component (cache, strategy learning) contributes |
+| **6** | Four qualitative examples | Concrete demonstrations of cache hits, abstention, clarification |
+
+**Comparison method:** Phase 0 and Phase 4 both export CSVs with the same 15 columns (`query`, `decision`, `trust_score`, `strategy_used`, `runtime_sec`, etc.). We join on `query` and highlight rows where `decision`, `strategy_used`, or `runtime_sec` changed.
+
+**Honest expectations:**
+- MRR on the 24 benchmark will not improve -- the retrievers are unchanged.
+- Improvements show up as: (a) cache hits on repeated queries (near-zero runtime), (b) strategy switches from `confidence` to `waterfall`/`voting` when memory learned a query type fails, (c) higher trust on previously-abstained queries because the weight combination shifted.
+
 ---
 
 ## 7. Limitations & Future Work

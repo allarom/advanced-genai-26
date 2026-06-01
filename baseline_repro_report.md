@@ -31,6 +31,8 @@ Instead of dealing with a bunch of scattered Python files from the original proj
 A random seed was also locked globally to ensure that metrics do not fluctuate across different runs:
 
 ```python
+import random, numpy as np, os
+
 SEED = 42
 random.seed(SEED)
 np.random.seed(SEED)
@@ -58,7 +60,6 @@ Here is a quick refresher on what we are measuring:
 
 > *This cell runs the shared evaluation pipeline for all baseline methods using the same QA set and qrels. For each query, it collects ranked document IDs, computes Precision@k, Recall@k, and reciprocal rank, and then aggregates results into per-query and per-method summary tables. Using one evaluation function for all methods ensures the reported baseline comparison is consistent and directly comparable.*
 
-\tiny
 
 | method     | queries_evaluated | MRR        | Precision@1 | Recall@1   | Precision@3 | Recall@3   | Precision@5 | Recall@5   | Precision@10 | Recall@10  |
 |------------|-------------------|------------|-------------|------------|-------------|------------|-------------|------------|--------------|------------|
@@ -68,7 +69,6 @@ Here is a quick refresher on what we are measuring:
 | Dense | 24 | 0.165525 | 0.041667 | 0.000147 | 0.069444 | 0.008953 | 0.058333 | 0.010095 | 0.066667 | 0.034097 |
 | BM25 | 24 | 0.151296 | 0.041667 | 0.001016 | 0.055556 | 0.001681 | 0.091667 | 0.005506 | 0.091667 | 0.011165 |
 
-\normalsize
 
 > *On the full-corpus setup, GraphRAG achieved the best overall ranking quality with the highest MRR (0.233), indicating that graph-guided retrieval was most effective at placing relevant evidence early in the ranked list. ReRank and Hybrid followed closely, with ReRank slightly outperforming Hybrid on MRR, which suggests that post-fusion refinement can improve early precision in some cases. Dense and BM25 showed lower MRR, indicating weaker top-rank relevance when used alone in this setting. Overall, the results suggest that full-corpus retrieval benefits from multi-source or graph-aware methods, while single-retriever baselines remain useful reference points but are less competitive at early-rank retrieval quality.*
 
@@ -82,7 +82,6 @@ The three orchestration strategies are evaluated separately from the individual 
 - **Waterfall:** Starts with only BM25 and Dense. Adds GraphRAG only when the two disagree significantly.
 - **Voting:** Runs all three agents in parallel and merges results using weighted Reciprocal Rank Fusion (RRF).
 
-\tiny
 
 | method     | queries_evaluated | MRR        | Precision@1 | Recall@1   | Precision@3 | Recall@3   | Precision@5 | Recall@5   | Precision@10 | Recall@10  |
 |------------|-------------------|------------|-------------|------------|-------------|------------|-------------|------------|--------------|------------|
@@ -90,7 +89,6 @@ The three orchestration strategies are evaluated separately from the individual 
 | Waterfall | 24 | 0.208303 | 0.041667 | 0.001344 | 0.138889 | 0.005348 | 0.100000 | 0.006052 | 0.070833 | 0.029732 |
 | Voting | 24 | 0.202154 | 0.000000 | 0.000000 | 0.097222 | 0.003699 | 0.125000 | 0.028352 | 0.095833 | 0.031149 |
 
-\normalsize
 
 > *For orchestration on the full corpus, Confidence achieved the best MRR (0.209), with Waterfall very close (0.208) and Voting slightly lower (0.202), so overall early-rank performance is similar across all three strategies. Waterfall produced the strongest Precision@3 (0.139), indicating better short-list relevance in the top few results, while Confidence led at Precision@5 (0.133). At larger cutoffs, Confidence and Voting were nearly tied on Recall@10, with Waterfall slightly behind. In practice, these results suggest that orchestration variants are competitive but not dramatically separated, with Confidence showing the most balanced behavior and Waterfall favoring early precision at small k.*
 
@@ -100,7 +98,6 @@ The three orchestration strategies are evaluated separately from the individual 
 
 The **subsample** (817 chunks) was used during development to debug the pipeline quickly. The **full corpus** (7,531 chunks) is roughly nine times larger, creating a much harder retrieval environment with many more distracting passages.
 
-\tiny
 
 | Scope       | Method   | MRR        | P@1        | P@3        | P@5        | P@10       | R@1        | R@3        | R@5        | R@10       |
 |-------------|----------|------------|------------|------------|------------|------------|------------|------------|------------|------------|
@@ -115,13 +112,12 @@ The **subsample** (817 chunks) was used during development to debug the pipeline
 | full_corpus | ReRank | 0.222952 | 0.041667 | 0.138889 | 0.125000 | 0.100000 | 0.000196 | 0.004480 | 0.006323 | 0.010619 |
 | subsample | ReRank | 0.442001 | 0.291667 | 0.250000 | 0.233333 | 0.245833 | 0.002821 | 0.006986 | 0.012018 | 0.029840 |
 
-\normalsize
 
 > *Across all methods, performance is consistently higher on the subsample than on the full corpus, with large MRR drops when moving to full-corpus retrieval. The strongest relative degradation appears in Dense and GraphRAG, which perform very well on subsample but lose substantial early-rank quality at full scale, indicating that larger search space and higher distractor density make relevance ranking harder. BM25 also declines, but less dramatically in relative terms, remaining a stable lexical baseline with low absolute performance in both scopes. Hybrid and ReRank remain competitive in full-corpus settings and outperform single BM25/Dense in several top-k metrics, suggesting fusion and reranking help recover robustness under scale. Overall, the comparison confirms that subsample results are optimistic, while full-corpus evaluation is more realistic and should be treated as the primary indicator of deployment-level retrieval difficulty.*
 
 ---
 
-#### 1.8 Reproducibility Comparison Table
+#### 2.4 Reproducibility Comparison Table
 
 | Aspect | Original Report (PDF) | Reproduced Notebook (Current) | Match Status |
 |--------|----------------------|-------------------------------|--------------|
