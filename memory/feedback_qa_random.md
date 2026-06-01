@@ -12,5 +12,5 @@
 | r06 | semantic | What position was Rosa Barba appointed to at ETH Zurich? | Full professor of art in space and time (department of architecture). | `66ceceb62d…`, 2023 |
 | r07 | entity | Who became president of the ETH lecturers' conference? | Edoardo Mazza | `7dbea25051…`, 2016 |
 | r08 | keyword | Which department is Mirko Meboldt a professor in at ETH Zurich? | Mechanical and process engineering. | `0ae4927945…`, 2016 |
-| r09 | entity | Who is the ETH professor whose group developed a new chip to study how neurons communicate? | Andreas Hierlemann | `85a2ef3ed2…`, 2021 |
+| r09 | entity | Who is the ETH professor whose group developed a new chip for testing toxicity on the placenta and embryo? | Andreas Hierlemann | `85a2ef3ed2…`, 2021 |
 | r10 | entity | Who is the project leader of the PeakBoil project in Mirko Meboldt's group? | Julian Ferchow | `46f6ed50b7…`, 2018 |

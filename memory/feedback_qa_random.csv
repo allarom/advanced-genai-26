@@ -7,5 +7,5 @@ r05,Who is the ETH peace researcher who co-developed a conflict mediation approa
 r06,What position was Rosa Barba appointed to at ETH Zurich?,Full professor of art in space and time (department of architecture).,semantic,answer,66ceceb62d3711c8e7e2454c70959433ad31bf18,ten professors appointed,2023
 r07,Who became president of the ETH lecturers' conference?,Edoardo Mazza,entity,answer,7dbea25051647a6a29ea919047b488fb43be6bd3,the lecturers conference has a new president,2016
 r08,Which department is Mirko Meboldt a professor in at ETH Zurich?,Mechanical and process engineering.,keyword,answer,0ae492794515e052120b41780121dae9321e0a1a,recovering hidden treasures and building boats,2016
-r09,Who is the ETH professor whose group developed a new chip to study how neurons communicate?,Andreas Hierlemann,entity,answer,85a2ef3ed2e1cb74809c700118c15e3cf61e6521,toxicity testing on the placenta and embryo,2021
+r09,Who is the ETH professor whose group developed a new chip for testing toxicity on the placenta and embryo?,Andreas Hierlemann,entity,answer,85a2ef3ed2e1cb74809c700118c15e3cf61e6521,toxicity testing on the placenta and embryo,2021
 r10,Who is the project leader of the PeakBoil project in Mirko Meboldt's group?,Julian Ferchow,entity,answer,46f6ed50b7530fc371d6692ea5d3b84773a496f7,peakboil,2018
