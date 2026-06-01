@@ -7,6 +7,7 @@ output:
 ## Step 1. RAG Baseline Reproduction & Learning Report
 
 *Goal: Reproduce baseline results with BM25, Dense Retrieval, GraphRAG, Hybrid Retrieval, and re-ranking, while reporting key metrics (Precision@k, Recall@k, MRR).*
+*Date: May 2026 | Environment: Google Colab / Local Python | Notebook: `Step_1_Baseline_and_Failure_Analysis.ipynb`*
 
 ---
 
@@ -47,7 +48,7 @@ os.environ['PYTHONHASHSEED'] = str(SEED)
 
 > *This notebook reproduces baseline retrieval results for https://github.com/Trista1208/advanced_genAI.git (23.12.2025). We load BM25, Dense, and GraphRAG resources for a selected scope (subsample or full_corpus), then construct Hybrid and Re-ranking on top of the same retrieved candidates using consistent fusion and reranking logic. We recompute all metrics ourselves from the benchmark QA set and qrels with one shared evaluator, reporting Precision@k, Recall@k, and MRR identically for every method. This setup ensures reproducibility in our environment, keeps comparisons fair across methods, and allows transparent side-by-side analysis between subsample and full-corpus performance.*
 
-#### Evaluation Metrics
+#### 1.3 Evaluation Metrics
 
 Here is a quick refresher on what we are measuring:
 - **Precision@K:** Out of the top K documents the system gave us, how many were actually correct?
