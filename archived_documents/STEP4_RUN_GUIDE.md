@@ -4,6 +4,58 @@ How to run `Step_4_Evaluation.ipynb` on Google Colab, store outputs, run ablatio
 
 ---
 
+## 0. Verify Feedback Q&A (Optional)
+
+Before running the evaluation, you can verify that the feedback questions and answers are factually grounded in the corpus.
+
+### Where the source documents are
+
+```
+baseline/advanced_genAI-main/advanced_genAI/storage/general/document_level/
+```
+
+Each file is named: `{doc_id}_DOC_LEVEL.json`
+
+### How to verify one item
+
+1. Look at the `source_doc_id` column in `memory/feedback_qa_matched.csv` or `memory/feedback_qa_random.csv`.
+2. Open the matching JSON file from the corpus folder above.
+3. Check the `"text"` field for the person name or claim from the answer.
+
+### Quick batch verification
+
+Add this cell in a Colab notebook (or run locally):
+
+```python
+import csv, json, os
+
+CORPUS_DIR = "baseline/advanced_genAI-main/advanced_genAI/storage/general/document_level"
+
+def check_csv(csv_path):
+    with open(csv_path) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            doc_id = row["source_doc_id"]
+            path = os.path.join(CORPUS_DIR, f"{doc_id}_DOC_LEVEL.json")
+            if not os.path.exists(path):
+                print(f"❌ {row['id']}: Missing file for {doc_id}")
+                continue
+            doc = json.load(open(path))
+            text = doc["text"].lower()
+            keywords = [w for w in row["answer"].lower().split() if len(w) > 3]
+            hits = sum(1 for w in keywords if w in text)
+            status = "✅" if hits >= 1 else "❌"
+            print(f"{status} {row['id']}: {row['question'][:50]}...")
+
+# Check both feedback files
+check_csv("memory/feedback_qa_matched.csv")
+check_csv("memory/feedback_qa_random.csv")
+```
+
+A green checkmark means the answer keywords appear in the source document. Red means they don't — that's a potential hallucination to fix before running the evaluation.
+
+---
+
 ## 1. Before You Start
 
 ### What you need
