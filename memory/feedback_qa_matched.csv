@@ -1,0 +1,11 @@
+id,question,answer,query_type,expected_decision,source_doc_id,source_title,source_year
+m01,Who became a professor of information technology and education at ETH Zurich in 2004?,Juraj Hromkovic,entity_temporal,answer,751b434a934817d1e8651e29ad620f791eafc730,interview juraj hromkovic,2017
+m02,Who is the director of the Zurich Information Security Center at ETH Zurich?,Srdjan Capkun,entity,answer,602257ce87e536185201725a3e3cd8cb8975e8ad,datascience capkun,2017
+m03,Who is the professor of bioethics at ETH Zurich?,Effy Vayena,entity,answer,04090bd66632088283224325d27885426971b50c,blueprint for the perfect coronavirus app,2020
+m04,What is GratXray?,An ETH spin-off in X-ray imaging co-founded by Marco Stampanoni.,keyword,answer,37b43409ad677128e9d267d103fa50cb8c158d52,x ray light revolutionaries,2017
+m05,Which prize did the ETH research team receive for their nanoelectronics simulation?,The ACM Gordon Bell Prize.,keyword,answer,1438012fdea89cac9bb71d0bf45e6965acf4f250,simulation booster for nanoelectronics,2019
+m06,What research field does professor Markus Reiher work in at ETH Zurich?,Theoretical chemistry.,semantic,answer,4d1c201f42dfcb5d5a3cb4275326f8ecee0a7b18,clarifiying complex chemical processes with quantum computers,2017
+m07,In which research area is Nenad Ban a professor at ETH Zurich?,Structural molecular biology.,semantic,answer,37a7c02b6bf46a0df34a15d9ce3db8b9884f12da,pauli lectures devoted to cell logistics,2016
+m08,What kind of bioplastic does Massimo Morbidelli's group investigate at ETH Zurich?,Polyethylene furanoate (PEF).,semantic,answer,2746df51b33d37570283d04dda376dae9f058aa4,pef for pet,2018
+m09,ETH professor of theoretical computer science?,Peter Widmayer,mixed,answer,7ed1ed33f7021aa2964db7a18b5b7ca60af49ca3,the eth nomad,2020
+m10,Control theory professor at ETH?,Mustafa Khammash,mixed,answer,09ac943888c4c6a80dc714b3d79528780785809e,cyborg bacteria,2016

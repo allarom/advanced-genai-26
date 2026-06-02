@@ -23,6 +23,7 @@ User Query --> Clarify? --> Retrieve --> Check Signals --> Trust Score --> [Reco
 | `Step_2_Reliability_Aware_Design.ipynb` | Design doc: architecture, signals, decision policy, trace schema |
 | `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb` | Implementation: 8 reliability agents + `ReliableAdaptiveRAG` |
 | `Step_4.1_extra_challenges.ipynb` | Bonus: memory-based adaptation + human-in-the-loop |
+| `Step_4_Evaluation.ipynb` | 9-phase evaluation: cold vs warm memory, HITL feedback, ablation |
 | `Step_1_Baseline_and_Failure_Analysis.ipynb` | Baseline reproduction and failure analysis |
 | `baseline_repro_report.md` | Baseline evaluation results |
 | `report.md` | Full project report with diagrams and analysis |
@@ -85,6 +86,8 @@ Open `Step_4.1_extra_challenges.ipynb`.
 feedback_ui("Who received ERC grants at ETH?")
 # Click Good / Bad / Fix -- feedback is saved to memory/step4_memory.json
 ```
+
+- **Evaluation:** `Step_4_Evaluation.ipynb` runs a 9-phase framework (baseline → cold → HITL feedback → warm re-eval → comparison → ablation → reliability metrics → challenge queries → qualitative analysis). Results are saved to `memory/csv_outputs/`.
 
 ---
 
