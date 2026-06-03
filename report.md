@@ -13,7 +13,7 @@ output:
 
 ## Executive Summary
 
-This report documents the design, implementation, and evaluation of a **Reliable Adaptive Agentic RAG system** built on top of a high-performing baseline retrieval pipeline. The project progresses through five logical stages:
+We built a **Reliable Adaptive Agentic RAG system** on top of a high-performing baseline retrieval pipeline. The project moves through five stages:
 
 1. **Baseline Reproduction** --- Reproduce and verify BM25, Dense, GraphRAG, Hybrid, and ReRank methods.
 2. **Multi-Agent Retrieval (Legacy Step 2)** --- Implement and compare orchestration strategies (Confidence, Waterfall, Voting).
@@ -342,12 +342,25 @@ The complete Step 3 notebook was executed end-to-end on Google Colab (29 May 202
 | **abstain** | 9 | 0.158 | 0.577 s | Recovery attempted but still below threshold |
 | **clarify** | 3 | 0.000 | ~0 s | Query too vague; no retrieval performed |
 
+**Per-query-type breakdown:**
+
+| Query Type | Count | Answered | Abstained | Clarified | Avg Trust (Ans) | Avg Trust (Abs) |
+|---|---|---|---|---|---|---|
+| **semantic** | 8 | 3 (37.5%) | 4 (50%) | 1 (12.5%) | 0.597 | 0.133 |
+| **keyword** | 6 | 3 (50%) | 2 (33%) | 1 (16.7%) | 0.663 | 0.175 |
+| **entity** | 4 | 2 (50%) | 1 (25%) | 1 (25%) | 0.570 | 0.240 |
+| **mixed** | 4 | 2 (50%) | 2 (50%) | 0 (0%) | 0.610 | 0.150 |
+| **entity_temporal** | 2 | 2 (100%) | 0 (0%) | 0 (0%) | 0.577 | - |
+
+![Grouped benchmark results by decision type](archived_documents/screenshots/02_grouped_means.png)
+
 **Key observations:**
 
-1. **Recovery is active.** Every abstained query shows `retry_count: 1` and strategy switched to `voting`, confirming the pipeline tried to fix the problem before giving up.
+1. **Recovery is active.** Every abstained query shows `retry_count: 1` and strategy switched to `voting`, confirming the pipeline attempted recovery before abstaining.
 2. **Trust scores separate correctly.** Answered queries average 0.608 trust; abstained queries average 0.158 --- a clean gap that shows the threshold is working.
 3. **Clarification is instant.** Vague queries like "what is e-sling?" trigger clarification in microseconds with zero trust.
 4. **Abstentions are slower.** They pay the cost of two retrievals (original + recovery), averaging 0.58 s vs 0.29 s for direct answers. Clarifications are essentially free.
+5. **Semantic queries are the hardest.** 50% of semantic queries abstain, compared to 33% of keyword and 0% of entity_temporal. Semantic questions require broader understanding that retriever switching cannot fix --- recovery succeeds 0/4 for semantic queries but 3/5 for keyword queries.
 
 **Selected abstention cases:**
 
@@ -359,6 +372,8 @@ The complete Step 3 notebook was executed end-to-end on Google Colab (29 May 202
 | "how do alpine plants respond to climate change?" | 0.320 | Close to threshold but conservative |
 
 These abstentions are correct: the system prefers saying "I don't know" over hallucinating.
+
+![Failure analysis: breakdown of why queries abstained by failure mode](archived_documents/screenshots/04_failure_analysis.png)
 
 ### 5.2 Qualitative Analysis
 
@@ -381,6 +396,22 @@ We measured the impact of each reliability agent by selectively disabling it. Al
 
 **Takeaway:** Removing the ContradictionAgent causes the system to answer everything --- including queries it should abstain on. The high overall trust (0.521) is a false-confidence failure mode, not a success. Removing RecoveryAgent increases abstentions from 9 to 12, showing recovery prevents unnecessary abstention on ~25% of queries.
 
+![Decision counts across ablation configurations](archived_documents/screenshots/03_decision_counts.png)
+
+**Why the trust scores are not comparable across ablations:**
+
+The full-system trust (0.363) is an *average across all 24 queries* (12 answered + 9 abstained + 3 clarified). When we remove the ContradictionAgent, the system answers 21 queries and abstains 0. The trust of 0.521 is the average of 21 answered queries only --- there are no abstained queries to pull the average down. This is not "higher trust"; it is *missing the low-trust abstentions entirely*. The trust formula did not change; the *decision mix* did. A system that never abstains will always have high average trust because it only reports high-trust answers.
+
+**Trust distribution by decision (full system):**
+
+| Decision | Count | Min Trust | Max Trust | Mean Trust | Std Dev |
+|---|---|---|---|---|---|
+| **answer** | 12 | 0.530 | 0.720 | 0.608 | 0.062 |
+| **abstain** | 9 | 0.020 | 0.320 | 0.158 | 0.099 |
+| **clarify** | 3 | 0.000 | 0.000 | 0.000 | 0.000 |
+
+The 0.062 standard deviation for answers shows the system is consistent: no answered query has trust below 0.530. The 0.099 standard deviation for abstentions is larger because some abstentions are close to the threshold (0.320) while others are far below (0.020). This confirms the threshold is well-calibrated: answered queries cluster high, abstained queries cluster low, and no query sits in the ambiguous middle.
+
 ### 5.4 Transition: From Reliable to Adaptive
 
 Step 3 shows the system can abstain and recover. But it does not learn. Every abstention is a missed opportunity to improve. Step 4.1 adds a memory layer that turns feedback into lasting improvements.
@@ -391,7 +422,7 @@ Step 3 shows the system can abstain and recover. But it does not learn. Every ab
 
 ### 6.1 What was built
 
-Step 4.1 targets bonus challenges **#4 (Memory-Based Adaptation)** and **#3 (Human-in-the-Loop)**, with partial coverage of **#1 (Learning-based orchestration)**.
+Step 4.1 addresses bonus challenges **#4 (Memory-Based Adaptation)** and **#3 (Human-in-the-Loop)**, with partial coverage of **#1 (Learning-based orchestration)**.
 
 | Component | Purpose |
 |-----------|---------|
@@ -400,6 +431,8 @@ Step 4.1 targets bonus challenges **#4 (Memory-Based Adaptation)** and **#3 (Hum
 | **M2.5 Rule-Based Reflection** | Reads the failure log and suggests switching strategy: `waterfall` when evidence is insufficient, `voting` when documents contradict each other |
 | **M3 Gemini Reflection (optional)** | Smarter query rewriting when `USE_LLM_REFLECTION=True` and a `GOOGLE_API_KEY` is set |
 | **HITL UI** | 3-control panel: Good confirms an answer, Bad marks it wrong, Fix updates an incorrect answer |
+
+![HITL feedback interface with Good, Bad, and Fix controls](archived_documents/screenshots/interaction.png)
 
 ### 6.2 Architecture
 
@@ -428,6 +461,8 @@ User Query
 |  -> writes to memory JSON       |
 +--------------------------------+
 ```
+
+![Memory system workflow showing cache, strategy selection, and feedback loop](archived_documents/screenshots/memory_sys_working.png)
 
 ### 6.3 Key design decisions
 
@@ -475,6 +510,23 @@ After populating memory with 10 feedback questions, we re-run the 24 benchmark q
 - After 10 random feedback questions: 0.245 s (**27% faster**)
 
 **Takeaway:** As predicted, MRR does not improve --- retrievers are unchanged. But the learned strategy and weight adjustments reduce runtime by 22-27%.
+
+**Per-query speedup (cold vs warm matched):**
+
+| Query Type | QID | Cold (s) | Warm (s) | Saved (s) | Speedup |
+|---|---|---|---|---|---|
+| semantic | 9 | 0.767 | 0.319 | 0.449 | **58.5%** |
+| semantic | 10 | 0.746 | 0.350 | 0.396 | **53.1%** |
+| entity | 8 | 0.384 | 0.188 | 0.196 | **51.1%** |
+| keyword | 5 | 0.583 | 0.363 | 0.220 | **37.7%** |
+| keyword | 13 | 0.204 | 0.198 | 0.007 | 3.3% |
+| semantic | 24 | 0.260 | 0.257 | 0.003 | 1.0% |
+| semantic | 18 | 0.377 | 0.498 | -0.121 | **-32.2%** |
+| semantic | 19 | 0.189 | 0.269 | -0.081 | **-42.8%** |
+
+The 22% average hides wide variation. Queries that triggered recovery (high cold runtime) benefit most --- the learned strategy often avoids recovery entirely by picking a better initial strategy. First-pass answers see almost no change. Two queries got slower because the learned strategy switched them from confidence to voting, which requires running all retrievers in parallel instead of gating.
+
+![Manual vs automated feedback comparison](archived_documents/screenshots/manual%20and%20auto%20feedback%20compare.png)
 
 **Note on feedback sources:** These results use the automated `do_feedback()` loop with programmatic gold comparison. A separate manual `feedback_ui()` session with 3 questions is documented as preliminary.
 
@@ -573,35 +625,72 @@ The results show modest but real gains from learning. They also reveal where the
 - **Current:** Orchestrator's extractive synthesizer or first-doc truncation.
 - **Upgrade:** Full generative LLM with grounding constraints.
 
-### Reflections
+### Critical Reflection
 
-These heuristics are pragmatic for a student project, but they remain coarse. The 30% token-overlap threshold for marking answers as correct is an automated proxy, not ground truth. The memory system learned from only 10 feedback questions per condition --- too few for robust per-type strategy learning. Contradiction detection relies on keyword matching, which misses semantic conflicts. The system works, but it is far from the robustness needed for production.
+**Which mechanisms were most useful?**
+
+The data identifies a single most important agent: **ContradictionAgent**. Removing it causes 9 false positives (queries that should have abstained but answered instead). No other single agent has this impact. The ablation table shows this directly: full system 12 answers, no-contradiction 21 answers. Those 9 extra answers are all unreliable.
+
+**RecoveryAgent** is the second most important. Without it, abstentions rise from 9 to 12. Recovery succeeds 3 out of 5 times for keyword queries but 0 out of 7 for semantic, entity, and mixed queries. This reveals a key limitation: recovery by retriever switching helps only when the problem is *which* retriever to use, not when the corpus simply lacks the information.
+
+**Trust scoring** works as designed. The 0.45 gap (0.608 vs 0.158) with zero overlap (no answered query below 0.530, no abstained query above 0.320) proves the threshold separates decisions cleanly. The 0.062 standard deviation for answers shows consistency.
+
+**Did abstention truly improve the system?**
+
+Yes for reliability, no for coverage. The 37.5% abstention rate with 100% challenge-set accuracy means the system correctly says "I don't know" when it should. But MRR did not improve: the system still retrieves the same documents; it just refuses to answer from them more often. Abstention is a reliability feature, not a retrieval upgrade.
+
+**Did adaptation (memory) truly improve the system?**
+
+Yes for speed, no for accuracy, and surprisingly it makes the system *more conservative*. The fixed-strategy ablation produces 14 answers vs 12 with memory. Memory learned to be cautious: when in doubt, it prefers strategies that abstain. This is not a bug --- it reflects the feedback signal (automated comparison against gold answers marks abstained queries as "not wrong"). The memory is optimizing for "avoid false answers," not "maximize correct answers."
+
+The 22% average speedup hides wide variation: queries with recovery see 37-58% gains, while first-pass answers barely change. Two queries even got slower because the learned strategy switched them from confidence to voting, which requires running all retrievers in parallel.
+
+**What did not work as expected?**
+
+1. **M1 cache had zero hits** on the 24 benchmark queries because all are unique. The cache is designed for repeated questions (e.g., "what is ETH+?" asked twice), but the benchmark is single-pass.
+2. **Keyword-based contradiction detection** misses semantic conflicts. "Expensive" vs "costly" or "rare" vs "scarce" would not be flagged.
+3. **10 feedback samples per condition** is too few for robust per-type strategy learning. Entity_temporal has only 2 samples total.
+4. **Automated feedback uses a 30% token-overlap proxy**, not human judgment. A correct answer phrased differently from the gold would be marked "bad."
 
 ### Tradeoffs
 
 | Dimension | What we gained | What we gave up |
 |-----------|---------------|-----------------|
-| **Reliability vs. coverage** | Fewer hallucinations (9/24 abstained) | Lower answer rate --- users get "I don't know" more often |
-| **Speed vs. accuracy** | Faster runtime after learning (0.337 s -> 0.245 s) | No improvement in MRR --- retrievers are unchanged |
-| **Simplicity vs. sophistication** | Debuggable heuristics, fast iteration | Misses nuanced cases an LLM verifier would catch |
-| **Abstention vs. helpfulness** | Safe abstention on uncertain queries | May frustrate users who expected an attempt |
+| **Reliability vs. coverage** | Zero false positives on challenge set; 0.45 trust gap | 37.5% abstention rate; users get "I don't know" more often |
+| **Speed vs. accuracy** | 22-27% faster after learning (up to 58% on some queries) | MRR unchanged; memory does not improve retrieval |
+| **Simplicity vs. sophistication** | Deterministic heuristics, debuggable traces, fast iteration | Keyword contradiction misses semantic conflicts; 30% overlap is a proxy |
+| **Abstention vs. helpfulness** | Safe abstention on uncertain queries; 100% challenge-set accuracy | May frustrate users who expected an attempt; 3 queries could have been recovered |
+| **Learning vs. data** | Memory adapts to feedback without retraining | Needs more than 10 samples per condition; cache useless on unique queries |
 
 ---
 
 ## 8. Conclusion
 
-We successfully:
-1. **Reproduced** the baseline and confirmed GraphRAG as the best single retriever (MRR 0.233).
-2. **Implemented** three orchestration strategies, selecting Confidence as the default (MRR 0.209).
-3. **Designed** a reliability layer with 8 specialized agents, a deterministic decision policy, and a unified trace schema.
-4. **Integrated** the reliability layer with the legacy engine via `%run` and wrapper functions.
-5. **Benchmarked** the full system on Google Colab (29 May 2026): 12 answered, 9 abstained, 3 clarified out of 24 queries, with recovery behavior and correctly separated trust scores.
-6. **Evaluated** the full 6-phase framework with quantitative ablation, reliability metrics, and challenge set results.
-7. **Built** Step 4.1 bonus system: persistent memory that learns from feedback, a human-in-the-loop interface, and an optional reflection agent.
+We built a system that separates **retrieval** (produces candidates) from **reliability judgment** (decides whether to answer). The data shows this separation works --- but not in the way we initially expected.
 
-The architecture separates **retrieval** (produces candidates) from **reliability judgment** (decides whether to answer). This provides a clean upgrade path from heuristics to LLM-based verification.
+**What the results prove.**
 
-While the system shows reliable abstention and adaptive recovery, the memory layer's learning remains coarse: equal weight nudges for all retrievers and only ~1-3 samples per query type. Future work would replace the counter-based approach with a contextual bandit and add per-retriever provenance tracking for precise credit assignment.
+The reliability layer is calibrated. A 0.45 trust gap (0.608 for answered queries vs 0.158 for abstained) with zero overlap between the two groups shows the threshold cleanly separates reliable from unreliable answers. On the 10-query challenge set, the system abstains correctly 100% of the time: no false abstentions, no false answers.
+
+The ablation study reveals which signals matter most. Removing the ContradictionAgent causes 9 false positives --- the single largest failure mode in the system. Removing the RecoveryAgent increases unnecessary abstentions from 9 to 12. These two agents together are responsible for the system's reliability. Trust scoring, ClarificationAgent, and GroundednessAgent provide supporting signals, but contradiction and recovery are the load-bearing mechanisms.
+
+**What surprised us.**
+
+Memory learning makes the system *more conservative*, not more accurate. The fixed-strategy ablation (no memory) produces 14 answers vs 12 with memory. Memory learned that abstaining is safer than answering --- because our automated feedback marks abstained queries as "not wrong." This is honest learning, but it optimizes for safety over helpfulness.
+
+The 22% average speedup from memory hides dramatic variation. Queries that trigger recovery see up to 58% faster runtimes because the learned strategy avoids the recovery loop entirely. But two queries got 32-43% slower because the learned strategy switched them from gated confidence to parallel voting, which runs all retrievers. Memory optimizes strategy, not correctness.
+
+Recovery does not work uniformly. It succeeds 3 out of 5 times for keyword queries but 0 out of 7 for semantic, entity, and mixed queries. Retriever switching fixes "wrong retriever" problems but cannot fix "information not in corpus" problems. Semantic queries --- the hardest type, with 50% abstention --- require understanding, not more documents.
+
+**What we could not prove.**
+
+We cannot show that memory improves answer quality. MRR is unchanged (0.3646 baseline, 0.3438 warm). The speedup is real but comes from avoiding recovery, not from retrieving better documents. The 10 feedback samples per condition are too few for robust learning. The M1 verified-answer cache had zero hits on our benchmark because all 24 queries were unique. Our automated feedback uses a 30% token-overlap proxy --- a correct answer phrased differently from the gold would be marked "bad."
+
+**Where this goes next.**
+
+The current system is a proof of concept that heuristics can provide reliable abstention. The upgrade path is clear: replace keyword contradiction with LLM-based semantic detection, replace the hand-tuned trust formula with calibration on labeled data, replace counter-based strategy memory with a contextual bandit, and add per-retriever provenance for precise credit assignment. The architecture --- 8 agents, a decision policy, a trace schema, and a memory wrapper --- is designed to absorb these upgrades without structural change.
+
+Retrieval is necessary but not sufficient. Reliability judgment is necessary but not sufficient. Together, they create a system that knows what it knows --- and, more importantly, knows what it does not.
 
 ---
 
