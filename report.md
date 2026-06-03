@@ -93,9 +93,9 @@ Single retrievers are brittle. BM25 fails on semantic questions; Dense misses ex
 ### 2.2 Agent architecture
 
 ```
-Query -> [Understand] -> {BM25 | Dense | Graph} -> [Fusion] -> [ReRank] -> [Synthesize] -> [Critic] -> Output
-         classify           parallel retrieval      RRF       X-Enc       extract       ground       ans/abs
-         set weights                              merge     re-rank     scoring       check
+Query -> [Parse] -> {BM25|D|G} -> [Fuse] -> [Rank] -> [Gen] -> [Judge] -> Out
+         classify     parallel       RRF      X-Enc    extract   ground   ans/abs
+         set weights  retrieval      merge    re-rank  scoring   check
 ```
 
 ### 2.3 Orchestration strategies compared
@@ -389,8 +389,6 @@ Step 4.1 addresses bonus challenges **#4 (Memory-Based Adaptation)** and **#3 (H
 | **M3 Gemini Reflection (optional)** | LLM query rewriting when `USE_LLM_REFLECTION=True` |
 | **HITL UI** | Good/Bad/Fix controls for human feedback |
 
-![HITL feedback interface with Good, Bad, and Fix controls](archived_documents/screenshots/interaction.png)
-
 ### 6.2 Architecture
 
 ```
@@ -419,7 +417,7 @@ User Query
 +--------------------------------+
 ```
 
-![Memory system workflow showing cache, strategy selection, and feedback loop](archived_documents/screenshots/memory_sys_working.png)
+![HITL feedback interface with Good, Bad, and Fix controls](archived_documents/screenshots/interaction.png)
 
 ### 6.3 Key design decisions
 
