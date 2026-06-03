@@ -47,7 +47,7 @@ Step_4_1_extra_challenges.ipynb          Step_4_Evaluation.ipynb
 ```
 Cell 1  Intro                "What this notebook evaluates"
 Cell 2  Setup                Mount Drive, clone repo, install packages
-Cell 3  Load                 %run Step_4.1 → imports rag_system, eval_qa_data, etc.
+Cell 3  Load                 %run Step_4_1 → imports rag_system, eval_qa_data, etc.
 Cell 4  Helpers              gold_map, run_one, run_batch, answer_matches_gold
 Cell 5-6  Context            Step 1→3 lineage table (MRR scores)
 

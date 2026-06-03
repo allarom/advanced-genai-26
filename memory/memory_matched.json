@@ -1,0 +1,285 @@
+{
+  "verified_answers": {
+    "2004 became education eth information professor technology zurich": {
+      "query": "Who became a professor of information technology and education at ETH Zurich in 2004?",
+      "answer": "Juraj Hromkovic",
+      "source": "human",
+      "ts": "2026-06-03 14:16:03"
+    },
+    "center director eth information security zurich zurich": {
+      "query": "Who is the director of the Zurich Information Security Center at ETH Zurich?",
+      "answer": "datascience capkun: **about srdjan capkun** srdjan capkun is professor for information security and director of the [zurich information security center (zisc)](https://zisc.ethz.ch/) at eth zurich. he is also the founding director of the recently established [quantum center](https://qc.ethz.ch/) at eth zurich and leads efforts to build superconducting quantum computers at the eth zurich - psi quantum computing hub. eth zurich is striking out in new directions in its doctoral studies.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:04"
+    },
+    "bioethics eth professor zurich": {
+      "query": "Who is the professor of bioethics at ETH Zurich?",
+      "answer": "Effy Vayena",
+      "source": "human",
+      "ts": "2026-06-03 14:16:04"
+    },
+    "gratxray": {
+      "query": "What is GratXray?",
+      "answer": "An ETH spin-off in X-ray imaging co-founded by Marco Stampanoni.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:04"
+    },
+    "eth nanoelectronics prize receive research simulation team their": {
+      "query": "Which prize did the ETH research team receive for their nanoelectronics simulation?",
+      "answer": "The ACM Gordon Bell Prize.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:04"
+    },
+    "eth field markus professor reiher research work zurich": {
+      "query": "What research field does professor Markus Reiher work in at ETH Zurich?",
+      "answer": "Theoretical chemistry.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:04"
+    },
+    "area ban eth nenad professor research zurich": {
+      "query": "In which research area is Nenad Ban a professor at ETH Zurich?",
+      "answer": "Structural molecular biology.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:04"
+    },
+    "bioplastic eth group investigate kind massimo morbidelli's zurich": {
+      "query": "What kind of bioplastic does Massimo Morbidelli's group investigate at ETH Zurich?",
+      "answer": "Polyethylene furanoate (PEF).",
+      "source": "human",
+      "ts": "2026-06-03 14:16:05"
+    },
+    "computer eth professor science theoretical": {
+      "query": "ETH professor of theoretical computer science?",
+      "answer": "**professor olga sorkine hornung** (*1981), currently associate professor at eth zurich, as full professor of computer science. 18 professors appointed at eth zurich: theoretical computer science with a focus on distributed computing and network algorithms. berger stayed on as an administrative assistant, but moved to the group of professor peter widmayer, who was working in theoretical computer science.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:05"
+    },
+    "control eth professor theory": {
+      "query": "Control theory professor at ETH?",
+      "answer": "Mustafa Khammash",
+      "source": "human",
+      "ts": "2026-06-03 14:16:05"
+    }
+  },
+  "strategy_stats": {
+    "entity_temporal": {
+      "confidence": {
+        "success": 0,
+        "fail": 1
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "entity": {
+      "confidence": {
+        "success": 1,
+        "fail": 1
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "keyword": {
+      "confidence": {
+        "success": 0,
+        "fail": 1
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 1
+      }
+    },
+    "semantic": {
+      "confidence": {
+        "success": 0,
+        "fail": 3
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "mixed": {
+      "confidence": {
+        "success": 1,
+        "fail": 1
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    }
+  },
+  "weight_memory": {
+    "entity_temporal": {
+      "bm25": 0.6,
+      "dense": 1.0,
+      "graph": 1.3
+    },
+    "entity": {
+      "bm25": 0.9,
+      "dense": 1.1,
+      "graph": 1.3
+    },
+    "keyword": {
+      "bm25": 1.1,
+      "dense": 0.9,
+      "graph": 0.5
+    },
+    "semantic": {
+      "bm25": 0.5,
+      "dense": 1.1,
+      "graph": 0.6
+    },
+    "mixed": {
+      "bm25": 1.0,
+      "dense": 1.2,
+      "graph": 0.8
+    }
+  },
+  "failure_log": [
+    {
+      "query": "Who became a professor of information technology and education at ETH Zurich in 2004?",
+      "query_type": "entity_temporal",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:03"
+    },
+    {
+      "query": "Who is the professor of bioethics at ETH Zurich?",
+      "query_type": "entity",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:04"
+    },
+    {
+      "query": "What is GratXray?",
+      "query_type": "keyword",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:04"
+    },
+    {
+      "query": "Which prize did the ETH research team receive for their nanoelectronics simulation?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:04"
+    },
+    {
+      "query": "Which prize did the ETH research team receive for their nanoelectronics simulation?",
+      "query_type": "keyword",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:04"
+    },
+    {
+      "query": "What research field does professor Markus Reiher work in at ETH Zurich?",
+      "query_type": "semantic",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:04"
+    },
+    {
+      "query": "In which research area is Nenad Ban a professor at ETH Zurich?",
+      "query_type": "semantic",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:04"
+    },
+    {
+      "query": "What kind of bioplastic does Massimo Morbidelli's group investigate at ETH Zurich?",
+      "query_type": "semantic",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:05"
+    },
+    {
+      "query": "Control theory professor at ETH?",
+      "query_type": "mixed",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:05"
+    },
+    {
+      "query": "who at eth received erc grants?",
+      "query_type": "entity",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:08"
+    },
+    {
+      "query": "when did the insight get to mars?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:08"
+    },
+    {
+      "query": "what did prof. schubert say about flying?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:09"
+    },
+    {
+      "query": "how do alpine plants respond to climate change?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:10"
+    },
+    {
+      "query": "how would you make ferzlizer without carbon emissions?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:11"
+    },
+    {
+      "query": "what research is eth famous for?",
+      "query_type": "mixed",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:11"
+    },
+    {
+      "query": "what conneczons does eth have to hong kong?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:14"
+    },
+    {
+      "query": "why should eth receive any additional funding?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:17"
+    },
+    {
+      "query": "does eth organize any competitions?",
+      "query_type": "mixed",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:18"
+    },
+    {
+      "query": "When did the Insight get to Venus?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:24:37"
+    },
+    {
+      "query": "When did Einstein become president of ETH?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:24:38"
+    }
+  ]
+}

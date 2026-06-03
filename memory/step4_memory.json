@@ -4,7 +4,7 @@
       "query": "Who received ERC grants at ETH?",
       "answer": "(verified) Several ETH researchers received ERC grants.",
       "source": "human",
-      "ts": "2026-05-29 22:59:53"
+      "ts": "2026-06-03 14:15:34"
     },
     "eth innovation support": {
       "query": "How does ETH support innovation?",
@@ -22,7 +22,7 @@
   "strategy_stats": {
     "entity": {
       "confidence": {
-        "success": 5,
+        "success": 6,
         "fail": 0
       },
       "waterfall": {
@@ -65,7 +65,7 @@
   },
   "weight_memory": {
     "entity": {
-      "bm25": 1.4,
+      "bm25": 1.5,
       "dense": 1.6,
       "graph": 1.6
     },
