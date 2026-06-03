@@ -529,7 +529,7 @@ advanced-genai-26/
 ├── multi-agent-step-2_strategy-A.ipynb   # Legacy Step 2 (retrieval engine)
 ├── Step_2_Reliability_Aware_Design.ipynb   # New Step 2 (design document)
 ├── Step_3_Reliable_Adaptive_Agentic_RAG.ipynb  # Step 3 (implementation)
-├── Step_4.1_extra_challenges.ipynb         # Step 4.1 bonus (memory + HITL)
+├── Step_4_1_extra_challenges.ipynb         # Step 4.1 bonus (memory + HITL)
 ├── memory/                                 # Persisted learned state
 ├── scripts/                          # Patch and test utilities
 │   ├── extract_pdf.py

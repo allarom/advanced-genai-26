@@ -81,7 +81,7 @@ Cell 2 (Setup) does everything:
 - Installs packages (`pytrec_eval`, `sentence-transformers`, etc.)
 - Changes working directory to the repo
 
-Cell 3 (`%run Step_4.1_extra_challenges.ipynb`) automatically runs Step 4.1 from the cloned repo. **You do not need to upload Step 4.1 separately.**
+Cell 3 (`%run Step_4_1_extra_challenges.ipynb`) automatically runs Step 4.1 from the cloned repo. **You do not need to upload Step 4.1 separately.**
 
 **Wait for Cell 2 to finish before continuing.** It takes ~1–2 min (package install + clone).
 
@@ -214,7 +214,7 @@ with open("/content/drive/MyDrive/step4_run_log.md", "w") as f:
 
 | Problem | Fix |
 |---------|-----|
-| `rag_system not found` | Cell 3 (`%run Step_4.1`) failed. Check its output for errors, then re-run cells 2–3 |
+| `rag_system not found` | Cell 3 (`%run Step_4_1`) failed. Check its output for errors, then re-run cells 2–3 |
 | Phase skipped (says "loaded") | Delete its CSV in the Files panel or via `!rm memory/csv_outputs/...csv`, then re-run that cell |
 | Slow first run | Normal — corpus + retrievers load. Wait 2–3 min |
 | `gold_map undefined` | Re-run from cell 4 (Helpers) or earlier — Phase 8 needs `gold_map` from Helpers |
