@@ -93,49 +93,9 @@ Single retrievers are brittle. BM25 fails on semantic questions; Dense misses ex
 ### 2.2 Agent architecture
 
 ```
-User Query
-    |
-    v
-+-------------------------+
-| QueryUnderstandingAgent |--> Classifies: entity_temporal / semantic / keyword / graph / mixed
-|                         |    Sets dynamic weights for retrievers
-+-------------------------+
-    |
-    v
-+-------------------------+
-| Retriever Agents        |
-| - BM25RetrieverAgent    |
-| - DenseRetrieverAgent   |
-| - GraphRetrieverAgent   |
-+-------------------------+
-    |
-    v
-+-------------------------+
-| FusionAgent             |--> Weighted RRF merge + deduplication
-+-------------------------+
-    |
-    v
-+-------------------------+
-| ReRankerAgent           |--> CrossEncoder re-ranking
-+-------------------------+
-    |
-    v
-+-------------------------+
-| AnswerSynthesizerAgent  |--> Extractive sentence scoring
-|                         |    (overlap + temporal bonus), top-3 pick
-+-------------------------+
-    |
-    v
-+-------------------------+
-| CriticAgent             |--> Grounding check (45% global overlap)
-|                         |    Temporal coherence (+-10 years)
-|                         |    Triggers re-retrieval if failed
-+-------------------------+
-    |
-    v
-+-------------------------+
-| Fallback: honest "not found" if still ungrounded after retry
-+-------------------------+
+Query -> [Understand] -> {BM25 | Dense | Graph} -> [Fusion] -> [ReRank] -> [Synthesize] -> [Critic] -> Output
+         classify           parallel retrieval      RRF       X-Enc       extract       ground       ans/abs
+         set weights                              merge     re-rank     scoring       check
 ```
 
 ### 2.3 Orchestration strategies compared
@@ -209,16 +169,16 @@ The old system produces an answer, but **does not ask: "Can I trust this answer?
 
 **Each agent has one responsibility:**
 
-| Agent | Signal / Output | Decision criterion |
-|-------|----------------|--------------------|
-| `EvidenceSufficiencyAgent` | `{"sufficient": bool, "score": float}` | Enough relevant docs? |
-| `GroundednessAgent` | `True/False` | Answer supported by docs? |
-| `ContradictionAgent` | `{"contradiction": bool, "reason": str}` | Docs disagree? |
-| `ClarificationAgent` | `{"needs_clarification": bool, "question": str}` | Query ambiguous? |
-| `CriticAgent` | List of feedback strings | Quality issues (temporal, etc.) |
-| `TrustAgent` | `{"score": float}` | Combined confidence [0, 1] |
-| `AbstentionAgent` | `True/False` | Trust below 0.4? |
-| `RecoveryAgent` | `{"action": "switch_strategy"/"rewrite_query"/"none"}` | How to fix low trust? |
+| Agent | Output | Criterion |
+|-------|--------|-----------|
+| `EvidenceSufficiencyAgent` | `bool, score` | Enough relevant docs? |
+| `GroundednessAgent` | `bool` | Answer supported by docs? |
+| `ContradictionAgent` | `bool, reason` | Docs disagree? |
+| `ClarificationAgent` | `bool, question` | Query ambiguous? |
+| `CriticAgent` | Feedback list | Quality issues (temporal, etc.) |
+| `TrustAgent` | `score: float` | Combined confidence [0, 1] |
+| `AbstentionAgent` | `bool` | Trust below 0.4? |
+| `RecoveryAgent` | `action: switch/rewrite/none` | How to fix low trust? |
 
 ### 3.3 Decision policy
 
@@ -289,7 +249,8 @@ def confidence_orchestrate(query, top_k=5):
     return answer, docs, trace
 ```
 
-This ensures:
+This ensures three properties:
+
 - **No regression**: Proven retrieval pipeline stays intact.
 - **Modular testing**: Baseline and reliability-augmented runs are side-by-side comparable.
 - **Clear ablation**: `ReliableAdaptiveRAG(ablate=["groundedness"])` disables checks individually.
@@ -338,9 +299,9 @@ The complete Step 3 notebook was executed end-to-end on Google Colab (29 May 202
 
 | Decision | Count | Avg Trust | Avg Runtime | Notes |
 |----------|-------|-----------|-------------|-------|
-| **answer** | 12 | 0.608 | 0.291 s | First-pass or recovered successfully |
-| **abstain** | 9 | 0.158 | 0.577 s | Recovery attempted but still below threshold |
-| **clarify** | 3 | 0.000 | ~0 s | Query too vague; no retrieval performed |
+| **answer** | 12 | 0.608 | 0.291 s | First-pass or recovered |
+| **abstain** | 9 | 0.158 | 0.577 s | Recovery failed |
+| **clarify** | 3 | 0.000 | ~0 s | Vague query |
 
 **Per-query-type breakdown:**
 
@@ -351,8 +312,6 @@ The complete Step 3 notebook was executed end-to-end on Google Colab (29 May 202
 | **entity** | 4 | 2 (50%) | 1 (25%) | 1 (25%) | 0.570 | 0.240 |
 | **mixed** | 4 | 2 (50%) | 2 (50%) | 0 (0%) | 0.610 | 0.150 |
 | **entity_temporal** | 2 | 2 (100%) | 0 (0%) | 0 (0%) | 0.577 | - |
-
-![Grouped benchmark results by decision type](archived_documents/screenshots/02_grouped_means.png)
 
 **Key observations:**
 
@@ -396,8 +355,6 @@ We measured the impact of each reliability agent by selectively disabling it. Al
 
 **Takeaway:** Removing the ContradictionAgent causes the system to answer everything --- including queries it should abstain on. The high overall trust (0.521) is a false-confidence failure mode, not a success. Removing RecoveryAgent increases abstentions from 9 to 12, showing recovery prevents unnecessary abstention on ~25% of queries.
 
-![Decision counts across ablation configurations](archived_documents/screenshots/03_decision_counts.png)
-
 **Why the trust scores are not comparable across ablations:**
 
 The full-system trust (0.363) is an *average across all 24 queries* (12 answered + 9 abstained + 3 clarified). When we remove the ContradictionAgent, the system answers 21 queries and abstains 0. The trust of 0.521 is the average of 21 answered queries only --- there are no abstained queries to pull the average down. This is not "higher trust"; it is *missing the low-trust abstentions entirely*. The trust formula did not change; the *decision mix* did. A system that never abstains will always have high average trust because it only reports high-trust answers.
@@ -426,11 +383,11 @@ Step 4.1 addresses bonus challenges **#4 (Memory-Based Adaptation)** and **#3 (H
 
 | Component | Purpose |
 |-----------|---------|
-| **M1 Verified-Answer Cache** | Exact-signature matching serves human-confirmed answers instantly |
-| **M2 Strategy & Weight Memory** | The memory counts successes per query type to find the best strategy. Weight nudging applies only to the Confidence orchestrator. |
-| **M2.5 Rule-Based Reflection** | Reads the failure log and suggests switching strategy: `waterfall` when evidence is insufficient, `voting` when documents contradict each other |
-| **M3 Gemini Reflection (optional)** | Smarter query rewriting when `USE_LLM_REFLECTION=True` and a `GOOGLE_API_KEY` is set |
-| **HITL UI** | 3-control panel: Good confirms an answer, Bad marks it wrong, Fix updates an incorrect answer |
+| **M1 Verified-Answer Cache** | Exact-signature matching for instant confirmed answers |
+| **M2 Strategy & Weight Memory** | Counts successes per query type; nudges Confidence weights |
+| **M2.5 Rule-Based Reflection** | Suggests `waterfall` on insufficient evidence, `voting` on contradiction |
+| **M3 Gemini Reflection (optional)** | LLM query rewriting when `USE_LLM_REFLECTION=True` |
+| **HITL UI** | Good/Bad/Fix controls for human feedback |
 
 ![HITL feedback interface with Good, Bad, and Fix controls](archived_documents/screenshots/interaction.png)
 
@@ -568,13 +525,14 @@ We compute reliability-focused metrics for the full system on the 24 evaluation 
 |--------|-------|-------------|
 | Abstention rate | 37.5% | 9 abstained / 24 queries |
 | Recovery attempt rate | 50.0% | 12 recovery attempts / 24 queries |
-| Recovery success rate | 100% | 12 recoveries led to answer / 12 attempts |
-| Grounded answer rate | 50.0% | 12 answers / 24 queries with grounding_score == 1.0 |
+| Recovery success rate | **25.0%** | 3 recoveries led to answer / 12 attempts (all keyword) |
+| Recovery failure rate | 75.0% | 9 recoveries still abstained / 12 attempts |
+| Grounded answer rate | 50.0% | 12 grounded answers / 24 total queries |
 | Trust calibration (answer) | 0.608 | Mean trust of answered queries |
 | Trust calibration (abstain) | 0.158 | Mean trust of abstained queries |
 | Clarification rate | 12.5% | 3 clarified / 24 queries |
 
-**Takeaway:** The system abstains on 37.5% of queries, and every recovery attempt succeeds in producing an answer. The 0.45 gap between answer trust (0.608) and abstain trust (0.158) shows the threshold correctly separates reliable and unreliable answers.
+**Takeaway:** The system abstains on 37.5% of queries. Recovery is attempted on half of all queries, but it succeeds only 25% of the time (3 out of 12 attempts, all for keyword queries). The other 9 recoveries still result in abstention --- retriever switching cannot fix missing information. The 0.45 gap between answer trust (0.608) and abstain trust (0.158) shows the threshold correctly separates reliable and unreliable answers.
 
 ### 6.10 Challenge Set
 
@@ -582,12 +540,12 @@ The 10 challenging queries defined in Phase 2 test specific reliability behavior
 
 **Challenge query results (warm memory, 10 queries):**
 
-| Challenge type | Count | Correct abstention | False abstention | Notes |
-|--------------|-------|-------------------|------------------|-------|
-| Ambiguous | 2 | 2 | 0 | Clarified correctly |
-| Insufficient evidence | 3 | 3 | 0 | Abstained correctly |
-| Conflicting evidence | 2 | 2 | 0 | Abstained after contradiction detected |
-| Off-topic | 3 | 3 | 0 | Abstained correctly |
+| Challenge type | Count | Result | Notes |
+|--------------|-------|--------|-------|
+| Ambiguous | 2 | 2/2 correct | Clarified |
+| Insufficient evidence | 3 | 3/3 correct | Abstained |
+| Conflicting evidence | 2 | 2/2 correct | Contradiction detected, abstained |
+| Off-topic | 3 | 3/3 correct | Abstained |
 
 **Takeaway:** The system correctly abstains on all 10 challenge queries. No false abstentions (answering when it should not) and no false answers (answering incorrectly).
 
