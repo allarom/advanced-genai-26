@@ -1,7 +1,28 @@
 ---
+geometry: "margin=2.5cm"
+fontsize: "10pt"
 output:
-  pdf_document: default
-  html_document: default
+  pdf_document:
+    keep_tex: false
+    toc: false
+  word_document: default
+header-includes:
+- \usepackage{setspace}
+- \onehalfspacing
+- \usepackage{times}
+- \usepackage{float}
+- \usepackage{booktabs}
+- \usepackage{array}
+- \usepackage{titlesec}
+- \titleformat{\section}[block]{\normalfont\normalsize\bfseries\centering}{\thesection}{1em}{}
+- \titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+- \titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+- \titlespacing*{\section}{0pt}{12pt}{6pt}
+- \titlespacing*{\subsection}{0pt}{12pt}{6pt}
+- \usepackage{caption}
+- \captionsetup{labelfont=bf,textfont=it,labelsep=newline,justification=raggedright,singlelinecheck=false,position=above,skip=4pt}
+- \setcounter{tocdepth}{2}
+lang: "en-GB"
 ---
 
 # Reliable Adaptive Agentic RAG System
@@ -9,7 +30,6 @@ output:
 
 **Date:** May 2026 (Step 3 benchmark: 29 May 2026)
 
----
 
 ## Executive Summary
 
@@ -23,13 +43,14 @@ We built a **Reliable Adaptive Agentic RAG system** on top of a high-performing 
 
 The core insight: **retrieval quality is necessary but not sufficient for trustworthy answers.** We wrap the best-performing orchestration strategy (Confidence, MRR ~0.209) with a reliability layer that decides when to answer, abstain, recover, or clarify. Step 4.1 adds a memory layer that remembers what worked and a human feedback loop that turns corrections into learned improvements.
 
----
 
 <!-- PLACEHOLDER: Teammate will complete baseline reproduction and failure taxonomy -->
 
 ## 1. Baseline Reproduction (Step 1)
 
 ### 1.1 What the baseline does
+
+\footnotesize
 
 ```
 User Query
@@ -52,6 +73,8 @@ User Query
 |  (relational)           |
 +-------------------------+
 ```
+
+\normalsize
 
 The system uses three different search agents:
 
@@ -82,7 +105,6 @@ All retrievers expose a unified `search(query, top_k)` interface via adapter cla
 | Full-corpus Dense MRR | 0.166 | 0.166 | Exact match |
 | Subsample to full trend | Metrics decrease | Metrics decrease | Match |
 
----
 
 ## 2. Multi-Agent Retrieval System (Legacy Step 2)
 
@@ -92,11 +114,21 @@ Single retrievers are brittle. BM25 fails on semantic questions; Dense misses ex
 
 ### 2.2 Agent architecture
 
+\footnotesize
+
 ```
-Query -> [Parse] -> {BM25|D|G} -> [Fuse] -> [Rank] -> [Gen] -> [Judge] -> Out
-         classify     parallel       RRF      X-Enc    extract   ground   ans/abs
-         set weights  retrieval      merge    re-rank  scoring   check
++--------+    +----------+    +----------+    +--------+
+| Query  |--->|  Parse   |--->|Retrievers|--->| Fusion |
+| (user) |    |(classify)|    |{BM25|D|G}|    | (RRF)  |
++--------+    +----------+    +----------+    +---+----+
+                                                  |
++--------+    +----------+    +----------+     +---v----+
+| Output |<---|  Critic  |<---| Synthesize|<---|ReRank  |
+|ans/abs |    | (ground) |    | (extract) |    |(X-Enc) |
++--------+    +----------+    +----------+     +--------+
 ```
+
+\normalsize
 
 ### 2.3 Orchestration strategies compared
 
@@ -116,7 +148,6 @@ Three strategies were implemented and evaluated:
 
 Orchestration improves retrieval coverage, but it never asks: "Is this answer actually correct?" The system answers blindly. We need a reliability layer that judges answer quality before returning it to the user.
 
----
 
 ## 3. Reliability-Aware Design (New Step 2)
 
@@ -126,46 +157,36 @@ The old system produces an answer, but **does not ask: "Can I trust this answer?
 
 ### 3.2 Architecture: The reliability layer wraps the old engine
 
+\footnotesize
+
 ```
-+-------------------------------------------------------------+
-|                     RELIABILITY LAYER                        |
-|  (New Step 2 / Step 3 -- signals, trust, decision, recovery)|
-|                                                              |
-|  +---------+  +---------+  +---------+  +---------+          |
-|  |Evidence |  |Grounded-|  |Contra-  |  |Clarifi- |          |
-|  |Suffici-|  |ness     |  |diction  |  |cation   |          |
-|  |ency     |  |Agent    |  |Agent    |  |Agent    |          |
-|  +----+----+  +----+----+  +----+----+  +----+----+          |
-|       |            |            |            |               |
-|       +------------+------+-----+------------+               |
-|                           |                                  |
-|                    +-------------+                           |
-|                    |  TrustAgent |--> trust score [0, 1]     |
-|                    +------+------+                           |
-|                           |                                  |
-|              +------------+------------+                     |
-|              |            |            |                     |
-|       +----------+ +----------+ +----------+                 |
-|       |Abstention| | Critic   | | Recovery |                 |
-|       |Agent     | | Agent    | | Agent    |                 |
-|       +----+-----+ +----+-----+ +----+-----+                 |
-|            |            |            |                       |
-|            +------------+----+-----+                         |
-|                               |                              |
-|                    +-----------------+                       |
-|                    |  Decision Policy |                      |
-|                    |  clarify? -> compute trust -> [recover] |
-|                    |  -> answer or abstain                   |
-|                    +-----------------+                       |
-+-------------------------------------------------------------+
-                              |
-                              v
-              +-------------------------+
-              |  Legacy Step 2 Engine   |
-              |  (Confidence Orchestrator)
-              |  --> retrieves, fuses, re-ranks, synthesizes
-              +-------------------------+
++--------------------------------------------------------------------------+
+|                       RELIABILITY LAYER ( Step 3 )                       |
+|  +----------+  +--------------+  +----------------+  +----------------+  |
+|  | Evidence |  | Groundedness |  | Contradiction  |  | Clarification  |  |
+|  +-----+----+  +-------+------+  +--------+-------+  +--------+-------+  |
+|        +--------------+---------|---------+------------------+           |
+|                         +---------------+                                |
+|                         |  TrustAgent   |  -->  trust score [0, 1]       |
+|                         +-------|-------+                                |
+|              +------------------+------------------+                     |
+|     +------------------+ +--------------+ +------------------+           |
+|     | Abstention Agent | | Critic Agent | |  Recovery Agent  |           |
+|     +---------+--------+ +-------+------+ +---------+--------+           |
+|               +------------------+------------------+                    |
+|                                 |                                        |
+|  +------------------------------+     +------------------------+         |
+|  |        Decision Policy       |     |   Legacy Step 2        |         |
+|  |  clarify -> trust -> recover |     | (Conf. Orchestrator)   |         |
+|  |  -> answer/abstain           | <-> |  retrieve -> fuse      |         |
+|  |                              |     |   -> re-rank -> synth  |         |
+|  +------------------------------+     +------------------------+         |                         |
++--------------------------------------------------------------------------+
+|                                               
+
 ```
+
+\normalsize
 
 **Each agent has one responsibility:**
 
@@ -184,32 +205,21 @@ The old system produces an answer, but **does not ask: "Can I trust this answer?
 
 The system makes decisions in this order:
 
-```
-1. CLARIFY   --> if query is ambiguous (short / pronouns / vague)
-                Return: {"decision": "clarify", "question": "..."}
-                (No retrieval happens for unclear queries.)
-
-2. RETRIEVE + CHECK SIGNALS  --> run the legacy engine, then compute
-                sufficiency, groundedness, contradiction, and trust score.
-
-3. RECOVER   --> if trust < 0.4 AND recovery is NOT ablated
-                - contradiction detected  --> switch strategy to "voting"
-                - not grounded             --> switch strategy to "waterfall"
-                - not sufficient           --> rewrite query with context
-                Then re-retrieve once and re-evaluate.
-
-4. ANSWER    --> if trust >= 0.4 after first check OR after successful recovery
-                Return: {"decision": "answer", "final_answer": "..."}
-
-5. ABSTAIN   --> if trust < 0.4 AND recovery failed or was disabled
-                Return: {"decision": "abstain", "reason": "..."}
-```
+| Step | Condition | Action |
+|------|-----------|--------|
+| **1. Clarify** | Query is ambiguous (short / pronouns / vague) | Return clarification question; no retrieval |
+| **2. Retrieve + Check** | Run legacy engine, compute signals | Sufficiency, groundedness, contradiction, trust |
+| **3. Recover** | Trust < 0.4 and recovery enabled | Switch strategy or rewrite query; re-retrieve once |
+| **4. Answer** | Trust >= 0.4 (first check or after recovery) | Return final answer |
+| **5. Abstain** | Trust < 0.4 and recovery failed / disabled | Return abstention with reason |
 
 **Important:** Recovery is attempted *before* giving up. The system tries to fix the problem once. Only if the retry still fails does it abstain.
 
 ### 3.4 Unified trace schema
 
 Every run returns the same dict structure for reproducibility and debugging:
+
+\footnotesize
 
 ```python
 {
@@ -231,9 +241,10 @@ Every run returns the same dict structure for reproducibility and debugging:
 }
 ```
 
+\normalsize
+
 With the architecture defined, we now turn to implementation: building each agent, wiring them together, and preserving the legacy retrieval pipeline unchanged.
 
----
 
 ## 4. Implementation Details (Step 3)
 
@@ -271,6 +282,8 @@ All signals use **lightweight heuristics** for interpretability and debuggabilit
 
 ### 4.3 Recovery logic
 
+\footnotesize
+
 ```python
 RecoveryAgent.recover(query, strategy, sufficiency, contradiction, grounded):
     if contradiction["contradiction"]:
@@ -283,11 +296,12 @@ RecoveryAgent.recover(query, strategy, sufficiency, contradiction, grounded):
     return {"action": "none"}
 ```
 
+\normalsize
+
 This mirrors the old CriticAgent's "broaden retrieval" retry, but at the orchestration level rather than the retriever-weight level.
 
 With all 8 agents implemented, we measure whether the system actually knows when to say "I don't know."
 
----
 
 ## 5. Evaluation
 
@@ -373,7 +387,6 @@ The 0.062 standard deviation for answers shows the system is consistent: no answ
 
 Step 3 shows the system can abstain and recover. But it does not learn. Every abstention is a missed opportunity to improve. Step 4.1 adds a memory layer that turns feedback into lasting improvements.
 
----
 
 ## 6. Extra Challenges: Memory-Based Adaptation & Human-in-the-Loop (Step 4.1)
 
@@ -388,34 +401,32 @@ Step 4.1 addresses bonus challenges **#4 (Memory-Based Adaptation)** and **#3 (H
 | **M2.5 Rule-Based Reflection** | Suggests `waterfall` on insufficient evidence, `voting` on contradiction |
 | **M3 Gemini Reflection (optional)** | LLM query rewriting when `USE_LLM_REFLECTION=True` |
 | **HITL UI** | Good/Bad/Fix controls for human feedback |
-
+\newpage
 ### 6.2 Architecture
+
+\footnotesize
 
 ```
 User Query
     |
     v
-+--------------------------------+
-| MemoryAugmentedRAG (wrapper)   |
-|  1. Cache hit? -> serve now     |
-|  2. Pick best strategy (memory) |
-|  3. Swap learned weights (conf) |
-|  4. Reflect on recovery         |
-|  5. Run Step 3, log outcome     |
-+--------------------------------+
-    |
-    v
-+--------------------------------+
-|  ReliableAdaptiveRAG (Step 3)   |
-|  8 reliability agents           |
-+--------------------------------+
-    |
-    v
-+--------------------------------+
-|  Human feedback (Good/Bad/Fix)  |
-|  -> writes to memory JSON       |
-+--------------------------------+
++------------------------------------+
+| MemoryAugmentedRAG (wrapper)       |
+|  1. Cached question? -> serve now  |     +----------------------------+
+|  2. Pick best strategy (memory)    | --> |  Reliable Adaptive RAG     |
+|  3. Swap learned weights (conf)    |     |       (Step 3)             |
+|  4. Reflect on recovery            |     |  8 reliability agents      |
+|  5. Run Step 3, log outcome        |     +----------------------------+
++------------------------------------+                   |
+                                                         |
+                                                         v
+                                        +--------------------------------+
+                                        |  Human feedback (Good/Bad/Fix) |
+                                        |  -> writes to memory JSON      |
+                                        +--------------------------------+
 ```
+
+\normalsize
 
 ![HITL feedback interface with Good, Bad, and Fix controls](archived_documents/screenshots/interaction.png)
 
@@ -549,7 +560,6 @@ The 10 challenging queries defined in Phase 2 test specific reliability behavior
 
 The results show modest but real gains from learning. They also reveal where the system remains coarse.
 
----
 
 ## 7. Limitations & Future Work
 
@@ -618,7 +628,6 @@ The 22% average speedup hides wide variation: queries with recovery see 37-58% g
 | **Abstention vs. helpfulness** | Safe abstention on uncertain queries; 100% challenge-set accuracy | May frustrate users who expected an attempt; 3 queries could have been recovered |
 | **Learning vs. data** | Memory adapts to feedback without retraining | Needs more than 10 samples per condition; cache useless on unique queries |
 
----
 
 ## 8. Conclusion
 
@@ -648,7 +657,8 @@ The current system is a proof of concept that heuristics can provide reliable ab
 
 Retrieval is necessary but not sufficient. Reliability judgment is necessary but not sufficient. Together, they create a system that knows what it knows --- and, more importantly, knows what it does not.
 
----
+
+\newpage
 
 ## Appendix A: Repository Structure
 
@@ -672,7 +682,6 @@ advanced-genai-26/
 \-- report.md                         # This report
 ```
 
----
 
 ## Appendix B: Generative AI Usage Declaration
 
@@ -685,4 +694,3 @@ This report and the accompanying code documentation were developed with assistan
 - **Brainstorming**: Discussing trade-offs (heuristics vs. LLMs, agent separation vs. merging, ablation defaults, composition vs. inheritance for memory injection).
 All code changes were reviewed and accepted by the authors. The AI did not have access to private data or external APIs beyond the project's own files. The core algorithms, design decisions, and evaluation results are the authors' own work.
 
----
