@@ -46,7 +46,7 @@ os.environ['PYTHONHASHSEED'] = str(SEED)
 
 *(The sections below keep the original comments and tables directly from the reproduction notebook.)*
 
-> *This notebook reproduces baseline retrieval results for https://github.com/Trista1208/advanced_genAI.git (23.12.2025). We load BM25, Dense, and GraphRAG resources for a selected scope (subsample or full_corpus), then construct Hybrid and Re-ranking on top of the same retrieved candidates using consistent fusion and reranking logic. We recompute all metrics ourselves from the benchmark QA set and qrels with one shared evaluator, reporting Precision@k, Recall@k, and MRR identically for every method. This setup ensures reproducibility in our environment, keeps comparisons fair across methods, and allows transparent side-by-side analysis between subsample and full-corpus performance.*
+> *This notebook reproduces baseline retrieval results for https://github.com/Trista1208/advanced_genAI.git (23.12.2025). The reported configuration uses the full corpus. We load BM25, Dense, and GraphRAG resources for the full corpus, then construct Hybrid and Re-ranking on top of the same retrieved candidates using consistent fusion and reranking logic. We recompute all metrics ourselves from the benchmark QA set and qrels with one shared evaluator, reporting Precision@k, Recall@k, and MRR identically for every method. This setup ensures reproducibility in our environment and keeps comparisons fair across methods on the realistic full-corpus setting.*
 
 #### 1.3 Evaluation Metrics
 
@@ -95,26 +95,9 @@ The three orchestration strategies are evaluated separately from the individual 
 
 ---
 
-#### 2.3 Subsample vs. Full Corpus Comparison
+#### 2.3 Reported Scope
 
-The **subsample** (817 chunks) was used during development to debug the pipeline quickly. The **full corpus** (7,531 chunks) is roughly nine times larger, creating a much harder retrieval environment with many more distracting passages.
-
-
-| Scope       | Method   | MRR        | P@1        | P@3        | P@5        | P@10       | R@1        | R@3        | R@5        | R@10       |
-|-------------|----------|------------|------------|------------|------------|------------|------------|------------|------------|------------|
-| full_corpus | BM25 | 0.151296 | 0.041667 | 0.055556 | 0.091667 | 0.091667 | 0.001016 | 0.001681 | 0.005506 | 0.011165 |
-| subsample | BM25 | 0.396272 | 0.166667 | 0.305556 | 0.316667 | 0.295833 | 0.002081 | 0.010785 | 0.017426 | 0.037034 |
-| full_corpus | Dense | 0.165525 | 0.041667 | 0.069444 | 0.058333 | 0.066667 | 0.000147 | 0.008953 | 0.010095 | 0.034097 |
-| subsample | Dense | 0.540476 | 0.375000 | 0.402778 | 0.350000 | 0.304167 | 0.031450 | 0.064326 | 0.073926 | 0.093394 |
-| full_corpus | GraphRAG | 0.232573 | 0.083333 | 0.097222 | 0.116667 | 0.116667 | 0.000687 | 0.003166 | 0.005892 | 0.052857 |
-| subsample | GraphRAG | 0.579613 | 0.458333 | 0.444444 | 0.366667 | 0.337500 | 0.029346 | 0.059344 | 0.063712 | 0.080849 |
-| full_corpus | Hybrid | 0.202154 | 0.000000 | 0.097222 | 0.125000 | 0.095833 | 0.000000 | 0.003699 | 0.028352 | 0.031149 |
-| subsample | Hybrid | 0.462108 | 0.250000 | 0.347222 | 0.316667 | 0.316667 | 0.004266 | 0.062629 | 0.076968 | 0.097059 |
-| full_corpus | ReRank | 0.222952 | 0.041667 | 0.138889 | 0.125000 | 0.100000 | 0.000196 | 0.004480 | 0.006323 | 0.010619 |
-| subsample | ReRank | 0.442001 | 0.291667 | 0.250000 | 0.233333 | 0.245833 | 0.002821 | 0.006986 | 0.012018 | 0.029840 |
-
-
-> *Across all methods, performance is consistently higher on the subsample than on the full corpus, with large MRR drops when moving to full-corpus retrieval. The strongest relative degradation appears in Dense and GraphRAG, which perform very well on subsample but lose substantial early-rank quality at full scale, indicating that larger search space and higher distractor density make relevance ranking harder. BM25 also declines, but less dramatically in relative terms, remaining a stable lexical baseline with low absolute performance in both scopes. Hybrid and ReRank remain competitive in full-corpus settings and outperform single BM25/Dense in several top-k metrics, suggesting fusion and reranking help recover robustness under scale. Overall, the comparison confirms that subsample results are optimistic, while full-corpus evaluation is more realistic and should be treated as the primary indicator of deployment-level retrieval difficulty.*
+The reported Step 1 reproduction uses the **full corpus** (7,531 chunks). Older subsample-compatible code remains in the notebook only to support legacy artifact formats, but subsample results are not part of the current reported baseline. We use the full corpus because it is the realistic retrieval setting for the downstream reliability experiments.
 
 ---
 
@@ -122,18 +105,29 @@ The **subsample** (817 chunks) was used during development to debug the pipeline
 
 | Aspect | Original Report (PDF) | Reproduced Notebook (Current) | Match Status |
 |--------|----------------------|-------------------------------|--------------|
-| Subsample size | 817 docs/chunks | 817 fixed-size chunks | Match |
 | Full-corpus size | 7,544 docs/chunks | 7,531 fixed-size chunks (local artifacts) | Minor mismatch |
-| Subsample best baseline MRR | Hybrid ~ 0.654 | GraphRAG ~ 0.580, Dense ~ 0.540, Hybrid ~ 0.462 | Partial mismatch |
 | Full-corpus Dense MRR | 0.166 (reported best baseline) | 0.166 | Match (value) |
 | Full-corpus baseline ranking | Dense reported strongest baseline | GraphRAG/ReRank/Hybrid above Dense in reproduced run | Mismatch |
 | Full-corpus orchestration best | Confidence ~ 0.205 (Step 3) | Confidence ~ 0.209 | Close match |
 | Full-corpus Voting MRR | ~ 0.190 (Step 3), ~ 0.189 (Step 2 section) | ~ 0.202 | Near but higher |
 | Full-corpus Waterfall MRR | ~ 0.161 (Step 3) | ~ 0.208 | Mismatch |
-| Subsample to full trend | Metrics decrease on full corpus | Metrics decrease on full corpus | Match |
 | Evaluation protocol | Shared IR metrics (P@k, Recall, MRR, plus nDCG in report) | Shared IR metrics (P@1/3/5/10, Recall@1/3/5/10, MRR) | Largely aligned |
 
-Our reproduction definitely confirms the main trend: things get much harder on the full corpus compared to the subsample. We also matched key numbers like the full-corpus Dense MRR (0.166). Some of the differences in specific scores or rankings are probably just because we're using different artifact versions or slightly different settings for our fusion and reranking.
+Our reproduction matches key full-corpus numbers such as Dense MRR (0.166). Some of the differences in specific scores or rankings are probably because we use different artifact versions or slightly different settings for fusion and reranking.
+
+---
+
+#### 2.5 Answer Quality and Efficiency Findings
+
+After choosing **Confidence** as the Step 1 reference baseline, we also evaluated answer synthesis with the previous-semester `step2_llm` Mistral-style generation path. This is important because retrieval metrics alone do not show whether the final generated answer is actually correct.
+
+For the reference baseline (`Confidence`, 24 benchmark queries), retrieval quality was modest: `MRR=0.209`, `Precision@5=0.133`, and `Recall@10=0.032`. This means that relevant evidence was often not ranked high enough for the answer synthesis step. Answer quality was also limited: `Answerable@5` was `0.50`, the median first relevant rank was `5`, average token-F1 against the gold answers was `0.184`, and exact match was `0.0`.
+
+The qualitative examples showed three important patterns. First, several generated answers were fluent but focused on related evidence rather than the exact target answer, such as the ERC grants and famous ETH alumni examples. Second, when relevant evidence was missing from the top retrieved context, the system either abstained with `NOT FOUND IN CONTEXT` or produced plausible but unsupported answers. Third, even when the answer was semantically correct, automatic metrics could still be harsh: for the question "when did the insight get to mars?", the generated answer included "November 26, 2018", while the gold answer was "26 november 2018", so the answer received `exact_match=0` despite matching the date.
+
+System efficiency was also a practical limitation. The Mistral synthesis path had a mean latency of about `76.16s` per query and a p95 latency of about `85.06s` per query in our run. The approximate cost proxy is therefore `Medium/High`, because every query requires LLM decoding on top of retrieval.
+
+Overall, today's answer-quality findings confirm that the Step 1 baseline is useful but not reliable enough as a final system. The main weaknesses are weak evidence ranking, answers that can focus on related but wrong evidence, unsupported generation when context is insufficient, and high generation latency. Metric brittleness is a secondary evaluation issue, not the main system weakness. These findings directly motivate the later reliability mechanisms in Steps 2-4, especially evidence sufficiency checks, groundedness checks, abstention, critique, and recovery.
 
 ---
 
@@ -141,4 +135,4 @@ Our reproduction definitely confirms the main trend: things get much harder on t
 
 By putting all the original project's scripts into one clean Jupyter Notebook, we now have a really solid and reproducible baseline. Out of all the single agents, GraphRAG did the best on the full corpus (MRR 0.233). For the orchestrators, Confidence came out on top (MRR 0.209). 
 
-The biggest takeaway is that performance dropped significantly for every method when we switched from the subsample to the full corpus. This shows that we really need to evaluate on the full corpus to know how the system will actually perform in the real world. Now that we have this baseline, we can use it as our benchmark when we design the full multi-agent system in Step 2.
+The biggest takeaway is that full-corpus retrieval remains difficult and answer synthesis remains fragile: even the best retrieval methods have modest early-rank performance, and the generated answers do not consistently match the gold answers. This is why the later project stages focus not only on retrieving evidence, but also on deciding whether the evidence is sufficient and whether the system should answer, recover, clarify, or abstain.

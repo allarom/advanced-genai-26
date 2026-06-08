@@ -44,8 +44,6 @@ We built a **Reliable Adaptive Agentic RAG system** on top of a high-performing 
 The core insight: **retrieval quality is necessary but not sufficient for trustworthy answers.** We wrap the best-performing orchestration strategy (Confidence, MRR ~0.209) with a reliability layer that decides when to answer, abstain, recover, or clarify. Step 4.1 adds a memory layer that remembers what worked and a human feedback loop that turns corrections into learned improvements.
 
 
-<!-- PLACEHOLDER: Teammate will complete baseline reproduction and failure taxonomy -->
-
 ## 1. Baseline Reproduction (Step 1)
 
 ### 1.1 What the baseline does
@@ -94,16 +92,31 @@ All retrievers expose a unified `search(query, top_k)` interface via adapter cla
 | Dense | 0.166 | 0.042 | 0.058 | 0.034 |
 | BM25 | 0.151 | 0.042 | 0.092 | 0.011 |
 
-**Key finding:** GraphRAG achieved the best overall ranking quality on the full corpus. However, all methods drop significantly from subsample (817 chunks) to full corpus (7,531 chunks), confirming that full-corpus evaluation is essential for realistic assessment.
+**Key finding:** GraphRAG achieved the best overall ranking quality on the full corpus. The reported Step 1 workflow uses the full-corpus setting only, because it is the realistic evaluation condition for the project.
 
 ### 1.3 Reproducibility Verification
 
 | Aspect | Original Report | Reproduced | Status |
 |--------|----------------|------------|--------|
-| Subsample size | 817 chunks | 817 chunks | Match |
 | Full-corpus size | ~7,544 chunks | 7,531 chunks | Near match |
 | Full-corpus Dense MRR | 0.166 | 0.166 | Exact match |
-| Subsample to full trend | Metrics decrease | Metrics decrease | Match |
+
+The Step 1 notebook still contains legacy compatibility code for older artifact formats, but the active reported configuration is fixed to `EVAL_SCOPE = "full_corpus"`.
+
+### 1.4 Failure Taxonomy from Step 1
+
+The Step 1 notebook also performs a structured failure analysis for the same reference baseline: `Confidence` orchestration on the full corpus. The taxonomy is heuristic and should be interpreted as diagnostic evidence rather than absolute ground truth, because it uses retrieval position, answer/gold overlap, and lightweight proxy signals.
+
+| Failure Type | Count |
+|--------------|-------|
+| `synthesis_failure` | 10 |
+| `retrieval_failure` | 8 |
+| `ranking_failure` | 5 |
+| `overconfidence_failure` | 4 |
+| `orchestration_failure` | 1 |
+| `contradiction_failure` | 1 |
+
+The table shows that the largest problems are not only retrieval misses, but also answer synthesis and overconfident generation. In several cases, relevant evidence exists but the generated answer focuses on the wrong detail or produces a weak match to the gold answer. In other cases, relevant evidence is missing from the retrieved context, yet the system still produces a fluent answer. These observations motivate the reliability layer in Steps 2-4: evidence sufficiency checks, groundedness checks, contradiction handling, trust scoring, abstention, critique, and recovery.
 
 
 ## 2. Multi-Agent Retrieval System (Legacy Step 2)
@@ -693,4 +706,3 @@ This report and the accompanying code documentation were developed with assistan
 - **Documentation drafting**: Structuring and writing this report and the README.md based on the actual codebase.
 - **Brainstorming**: Discussing trade-offs (heuristics vs. LLMs, agent separation vs. merging, ablation defaults, composition vs. inheritance for memory injection).
 All code changes were reviewed and accepted by the authors. The AI did not have access to private data or external APIs beyond the project's own files. The core algorithms, design decisions, and evaluation results are the authors' own work.
-
