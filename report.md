@@ -49,6 +49,8 @@ The core insight: **retrieval quality is necessary but not sufficient for trustw
 
 ## 1. Baseline Reproduction (Step 1)
 
+**This section is a summary; the full baseline reproduction is documented in `baseline_repro_report.pdf` in the repository.** The full version covers all five retrieval methods and the three orchestration strategies on the full corpus, with complete Precision@k, Recall@k, and MRR tables, answer-quality and efficiency (latency/cost) findings, and the reproduction methodology.
+
 ### 1.1 What the baseline does
 
 \footnotesize
