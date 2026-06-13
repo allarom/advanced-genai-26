@@ -26,20 +26,23 @@ lang: "en-GB"
 ---
 
 # Reliable Adaptive Agentic RAG System
-## Steps 1-3 + Step 4.1 Bonus | Advanced Generative AI Capstone
+## Steps 1-4 + Step 4.1 Bonus | Advanced Generative AI Capstone
 
 **Date:** May 2026 (Step 3 benchmark: 29 May 2026)
 
 
 ## Executive Summary
 
-We built a **Reliable Adaptive Agentic RAG system** on top of a high-performing baseline retrieval pipeline. The project moves through five stages:
+We built a **Reliable Adaptive Agentic RAG system** on top of a high-performing baseline retrieval pipeline. The project moves through six stages:
 
-1. **Baseline Reproduction** --- Reproduce and verify BM25, Dense, GraphRAG, Hybrid, and ReRank methods.
+1. **Baseline Reproduction (Step 1)** --- Reproduce and verify BM25, Dense, GraphRAG, Hybrid, and ReRank methods.
 2. **Multi-Agent Retrieval (Legacy Step 2)** --- Implement and compare orchestration strategies (Confidence, Waterfall, Voting).
 3. **Reliability-Aware Design (New Step 2)** --- Design architecture for evidence sufficiency, groundedness, contradiction detection, trust scoring, and adaptive recovery.
 4. **Reliable Adaptive Implementation (Step 3)** --- Code 8 reliability agents that wrap the legacy retrieval engine.
-5. **Memory & Human-in-the-Loop (Step 4.1)** --- Bonus: persistent memory that learns from feedback and a human feedback interface.
+5. **Evaluation (Step 4)** --- Benchmark the reliable system against the baseline, ablate each agent, and measure abstention, grounding, and trust-calibration metrics.
+6. **Memory & Human-in-the-Loop (Step 4.1)** --- Bonus: persistent memory that learns from feedback and a human feedback interface.
+
+The required Step 4 evaluation is presented in Section 5 and Sections 6.4-6.10; the Step 4.1 memory work is the bonus.
 
 The core insight: **retrieval quality is necessary but not sufficient for trustworthy answers.** We wrap the best-performing orchestration strategy (Confidence, MRR ~0.209) with a reliability layer that decides when to answer, abstain, recover, or clarify. Step 4.1 adds a memory layer that remembers what worked and a human feedback loop that turns corrections into learned improvements.
 
@@ -80,7 +83,7 @@ The system uses three different search agents:
 - **Dense Retriever (Meaning Agent):** Uses `multilingual-e5-large-instruct` embeddings to capture semantic similarity.
 - **GraphRAG (Detective Agent):** Uses community detection over a knowledge graph to find connected evidence.
 
-All retrievers expose a unified `search(query, top_k)` interface via adapter classes. Evaluation uses shared `Precision@k`, `Recall@k`, and `MRR` metrics computed with `pytrec_eval`.
+All retrievers expose a unified `search(query, top_k)` interface via adapter classes. Evaluation uses shared `Precision@k`, `Recall@k`, and `MRR` metrics computed with a shared custom IR evaluator (`reciprocal_rank`, `precision_at_k`, `recall_at_k`), so every method is scored the same way.
 
 ### 1.2 Baseline Results (Full Corpus, 24 queries)
 
@@ -115,6 +118,8 @@ The Step 1 notebook also performs a structured failure analysis for the same ref
 | `overconfidence_failure` | 4 |
 | `orchestration_failure` | 1 |
 | `contradiction_failure` | 1 |
+
+These labels are non-exclusive: a single query can show more than one failure mode, so the counts add up to 29 rather than the 24 queries evaluated.
 
 The table shows that the largest problems are not only retrieval misses, but also answer synthesis and overconfident generation. In several cases, relevant evidence exists but the generated answer focuses on the wrong detail or produces a weak match to the gold answer. In other cases, relevant evidence is missing from the retrieved context, yet the system still produces a fluent answer. These observations motivate the reliability layer in Steps 2-4: evidence sufficiency checks, groundedness checks, contradiction handling, trust scoring, abstention, critique, and recovery.
 
@@ -316,7 +321,7 @@ This mirrors the old CriticAgent's "broaden retrieval" retry, but at the orchest
 With all 8 agents implemented, we measure whether the system actually knows when to say "I don't know."
 
 
-## 5. Evaluation
+## 5. Evaluation (Step 4)
 
 ### 5.1 Benchmark Results
 
@@ -374,6 +379,8 @@ These abstentions are correct: the system prefers saying "I don't know" over hal
 
 We measured the impact of each reliability agent by selectively disabling it. All ablations ran on the same 24 queries.
 
+**A note on the MRR column.** This MRR (0.3646) is the underlying orchestrator's retrieval score from the Sections 5 and 6 evaluation harness (`retrieve_k=50`, `top_k=10`, with a neural cross-encoder reranker). The Step 1 / Step 2 reproduction MRR (0.209) was measured differently --- over depth-100 with lexical-overlap reranking --- so the two are **not directly comparable**: the gap from 0.209 to 0.3646 is a harness and reranker difference, not a gain from the reliability layer. Every MRR comparison in Sections 5 and 6 stays within this one harness.
+
 | Config | Ans | Abs | Clar | Trust | Time | MRR |
 |--------|-----|-----|------|-------|------|-----|
 | **Full system** | 12 | 9 | 3 | 0.363 | 0.362 s | 0.3646 |
@@ -390,11 +397,11 @@ The full-system trust (0.363) is an *average across all 24 queries* (12 answered
 
 | Decision | Count | Min Trust | Max Trust | Mean Trust | Std Dev |
 |---|---|---|---|---|---|
-| **answer** | 12 | 0.530 | 0.720 | 0.608 | 0.062 |
-| **abstain** | 9 | 0.020 | 0.320 | 0.158 | 0.099 |
+| **answer** | 12 | 0.530 | 0.720 | 0.608 | 0.057 |
+| **abstain** | 9 | 0.000 | 0.320 | 0.158 | 0.116 |
 | **clarify** | 3 | 0.000 | 0.000 | 0.000 | 0.000 |
 
-The 0.062 standard deviation for answers shows the system is consistent: no answered query has trust below 0.530. The 0.099 standard deviation for abstentions is larger because some abstentions are close to the threshold (0.320) while others are far below (0.020). This confirms the threshold is well-calibrated: answered queries cluster high, abstained queries cluster low, and no query sits in the ambiguous middle.
+The 0.057 standard deviation for answers shows the system is consistent: no answered query has trust below 0.530. The 0.116 standard deviation for abstentions is larger because some abstentions are close to the threshold (0.320) while others are far below (0.000). This confirms the threshold is well-calibrated: answered queries cluster high, abstained queries cluster low, and no query sits in the ambiguous middle.
 
 ### 5.4 Transition: From Reliable to Adaptive
 
@@ -468,7 +475,7 @@ Before learning, we check that wrapping Step 3 with an empty `MemoryStore` does 
 
 | Config | Ans | Abs | Clar | Trust | Time | MRR |
 |--------|-----|-----|------|-------|------|-----|
-| **Baseline Step 3** | 12 | 9 | 3 | 0.363 | 0.362 s | 0.3646 |
+| **Step 3 (no memory)** | 12 | 9 | 3 | 0.363 | 0.362 s | 0.3646 |
 | **Cold memory** (empty cache) | 12 | 9 | 3 | 0.363 | 0.337 s | 0.3438 |
 
 **Takeaway:** The memory wrapper adds no decision overhead and slightly reduces runtime (0.362 s -> 0.337 s). MRR stays within measurement noise --- retrievers are unchanged.
@@ -572,7 +579,7 @@ The challenge set has 12 queries (run on the plain system, no memory cache) acro
 
 Aggregate reliability metrics on this set: **correct abstention 3/6, false abstention 0/4, clarification 2/2**. The system behaved correctly on 9 of 12 queries.
 
-**Takeaway:** The system handles ambiguous, adversarial, and standard queries correctly, and never falsely abstains on an answerable query (0/4). Its weak point is conflicting evidence: both conflicting queries ("Did ETH's student numbers go up or down in 2015?" and "Is ETH bigger or smaller than EPFL in staff count?") were answered instead of abstained. The keyword-based ContradictionAgent only fires when opposing terms appear literally in the retrieved passages, so a comparison phrased in the query but not contradicted in the evidence slips through. This is the §7 limitation in practice, and it motivates semantic (NLI-based) contradiction detection.
+**Takeaway:** The system handles ambiguous, adversarial, and standard queries correctly, and never falsely abstains on an answerable query (0/4). Its weak point is conflicting evidence: both conflicting queries ("Did ETH's student numbers go up or down in 2015?" and "Is ETH bigger or smaller than EPFL in staff count?") were answered instead of abstained. The keyword-based ContradictionAgent only fires when opposing terms appear literally in the retrieved passages, so a comparison phrased in the query but not contradicted in the evidence slips through. This is the Section 7 limitation in practice, and it motivates semantic (NLI-based) contradiction detection.
 
 The results also show where the system remains coarse, which the next section examines.
 
@@ -615,11 +622,11 @@ The data identifies a single most important agent: **ContradictionAgent**. Remov
 
 **RecoveryAgent** is the second most important. Without it, abstentions rise from 9 to 12. Recovery succeeds 3 out of 5 times for keyword queries but 0 out of 7 for semantic, entity, and mixed queries. This reveals a key limitation: recovery by retriever switching helps only when the problem is *which* retriever to use, not when the corpus simply lacks the information.
 
-**Trust scoring** works as designed. The 0.45 gap (0.608 vs 0.158) with zero overlap (no answered query below 0.530, no abstained query above 0.320) proves the threshold separates decisions cleanly. The 0.062 standard deviation for answers shows consistency.
+**Trust scoring** works as designed. The 0.45 gap (0.608 vs 0.158) with zero overlap (no answered query below 0.530, no abstained query above 0.320) proves the threshold separates decisions cleanly. The 0.057 standard deviation for answers shows consistency.
 
 **Did abstention truly improve the system?**
 
-Yes for reliability, no for coverage. The 37.5% abstention rate, with zero false abstentions on the challenge set (0/4), means the system reliably says "I don't know" on unanswerable queries --- though it still over-answers conflicting-evidence cases (§6.10). But MRR did not improve: the system still retrieves the same documents; it just refuses to answer from them more often. Abstention is a reliability feature, not a retrieval upgrade.
+Yes for reliability, no for coverage. The 37.5% abstention rate, with zero false abstentions on the challenge set (0/4), means the system reliably says "I don't know" on unanswerable queries --- though it still over-answers conflicting-evidence cases (Section 6.10). But MRR did not improve: the system still retrieves the same documents; it just refuses to answer from them more often. Abstention is a reliability feature, not a retrieval upgrade.
 
 **Did adaptation (memory) truly improve the system?**
 
@@ -651,7 +658,7 @@ We built a system that separates **retrieval** (produces candidates) from **reli
 
 **What the results prove.**
 
-The reliability layer is calibrated. A 0.45 trust gap (0.608 for answered queries vs 0.158 for abstained) with zero overlap between the two groups shows the threshold cleanly separates reliable from unreliable answers. On the 12-query challenge set, the system abstains correctly on 3 of 6 unanswerable queries with no false abstentions (0/4); the misses are the two conflicting-evidence queries, where keyword contradiction did not fire (§6.10).
+The reliability layer is calibrated. A 0.45 trust gap (0.608 for answered queries vs 0.158 for abstained) with zero overlap between the two groups shows the threshold cleanly separates reliable from unreliable answers. On the 12-query challenge set, the system abstains correctly on 3 of 6 unanswerable queries with no false abstentions (0/4); the misses are the two conflicting-evidence queries, where keyword contradiction did not fire (Section 6.10).
 
 The ablation study reveals which signals matter most. Removing the ContradictionAgent causes 9 false positives --- the single largest failure mode in the system. Removing the RecoveryAgent increases unnecessary abstentions from 9 to 12. These two agents together are responsible for the system's reliability. Trust scoring, ClarificationAgent, and GroundednessAgent provide supporting signals, but contradiction and recovery are the load-bearing mechanisms.
 
@@ -665,7 +672,7 @@ Recovery does not work uniformly. It succeeds 3 out of 5 times for keyword queri
 
 **What we could not prove.**
 
-We cannot show that memory improves answer quality. MRR is unchanged (0.3646 baseline, 0.3438 warm). The speedup is real but comes from avoiding recovery, not from retrieving better documents. The 10 feedback samples per condition are too few for robust learning. The M1 verified-answer cache had zero hits on our benchmark because all 24 queries were unique. Our automated feedback uses a 30% token-overlap proxy --- a correct answer phrased differently from the gold would be marked "bad."
+We cannot show that memory improves answer quality. MRR is unchanged (0.3646 for Step 3 without memory, 0.3438 warm). The speedup is real but comes from avoiding recovery, not from retrieving better documents. The 10 feedback samples per condition are too few for robust learning. The M1 verified-answer cache had zero hits on our benchmark because all 24 queries were unique. Our automated feedback uses a 30% token-overlap proxy --- a correct answer phrased differently from the gold would be marked "bad."
 
 **Where this goes next.**
 

@@ -43,12 +43,14 @@ Read-only audit of the project + reports for severe logic/faithfulness errors, r
 
 ## P1 — Important (real marks at stake)
 
-### P1-1. `pytrec_eval` claim is false (faithfulness)
+### P1-1. `pytrec_eval` claim is false (faithfulness) — **DONE**
+- **STATUS: DONE** — §1.1 now reads "a shared custom IR evaluator (`reciprocal_rank`, `precision_at_k`, `recall_at_k`)"; no `pytrec_eval` mention remains in `report.md`.
 - **[impact: Step1=15, Step5=5]** **[effort: quick]**
 - `report.md` §1.1: *"metrics computed with `pytrec_eval`."* The Step 1 notebook actually computes MRR/P@k/Recall@k with **custom functions** (`reciprocal_rank()`, `precision_at_k()`, `recall_at_k()` ~line 464). **Falsification check:** `pytrec_eval` appears **only in the `pip install` line** — `import pytrec` / `pytrec_eval.` / `RelevanceEvaluator` have **zero** hits in the notebook, so it is installed but never used. `baseline_repro_report.md` correctly says "recompute ourselves with one shared evaluator."
 - **Fix:** change §1.1 to "computed with a shared custom IR evaluator" (matches the baseline report and the code).
 
-### P1-2. The two "baseline MRR" numbers are NOT comparable (invalid comparison) — VERIFIED against code
+### P1-2. The two "baseline MRR" numbers are NOT comparable (invalid comparison) — VERIFIED against code — **DONE (report-only, option b)**
+- **STATUS: DONE** — added a "note on the MRR column" in §5.3 stating the §5–§6 MRR (0.3646, depth-10 + neural cross-encoder) is not comparable to the Step-1/2 reproduction MRR (0.209, depth-100 + lexical overlap); renamed the ambiguous "Baseline Step 3" label (and the §8 limitation line) to "Step 3 (no memory)". Kept the valid internal 0.3646→0.3438 comparison. No code re-run (Phase B skipped).
 - **[impact: Step4=10, Step1=15]** **[effort: medium]**
 - **What each number actually is (from the code, not the prose):**
   - **Step 1 "Confidence MRR = 0.209"**: computed by Step 1's *own reproduction* `orchestration_methods['Confidence'].search(q, top_k=TOP_N)` with **`TOP_N = 100`** (ranks 100 docs), MRR via `reciprocal_rank` over depth-100.
@@ -65,7 +67,8 @@ Read-only audit of the project + reports for severe logic/faithfulness errors, r
 - Consequence 2 (notable): **abstained queries have HIGHER retrieval MRR (0.452) than answered ones (0.299)** — qid 4/11/25 abstained despite the relevant doc at **rank 1 (MRR=1.0)**. So abstention is driven by the trust heuristics, not by retrieval failure. The report's "abstentions are correct / threshold cleanly separates" framing is about trust scores, but on this 24-query set several abstentions sit on well-retrieved queries — i.e. possible **over-conservative / false abstentions** worth acknowledging (MRR≠groundedness, so not necessarily wrong, but the narrative should be nuanced).
 - **Fix:** (a) state explicitly that MRR is the underlying orchestrator IR, decision-independent; (b) report answer-only MRR (0.299) alongside the all-query value; (c) soften the "abstentions are all correct" claim for the benchmark set, or add the groundedness rationale for the high-MRR abstentions.
 
-### P1-3. Three wrong numbers in §5.3 trust-distribution table (faithfulness)
+### P1-3. Three wrong numbers in §5.3 trust-distribution table (faithfulness) — **DONE**
+- **STATUS: DONE** — corrected answer Std 0.062→0.057, abstain Min 0.020→0.000, abstain Std 0.099→0.116 in the §5.3 table + prose + §8 recap; synced `verify_facts.py` expected values; `verify_facts.py` now prints NO ERRORS.
 - **[impact: Step4=10]** **[effort: quick]**
 - `verify_facts.py` FAILs vs the CSVs:
   - answer **Std Dev**: report `0.062` → actual **0.057**
@@ -74,7 +77,8 @@ Read-only audit of the project + reports for severe logic/faithfulness errors, r
 - The prose at §5.3 (line ~397) repeats `0.062`, `0.099`, and "far below (0.020)" — update those too.
 - **Fix:** correct the four cells + the sentence. (All other §5.1/5.3/6.6/6.9/8 numbers verified correct.)
 
-### P1-4. Title/framing undersells the required Step 4 evaluation
+### P1-4. Title/framing undersells the required Step 4 evaluation — **DONE**
+- **STATUS: DONE** — title changed to "Steps 1-4 + Step 4.1 Bonus"; executive summary now lists "Evaluation (Step 4)" as an explicit stage plus a plain-language pointer ("the required Step 4 evaluation is presented in Section 5 and Sections 6.4-6.10"); Section 5 header renamed to "Evaluation (Step 4)". Also replaced every section symbol in `report.md` with plain "Section N" wording for readability.
 - **[impact: Step4=10, Step5=5]** **[effort: quick]**
 - Title: *"Steps 1–3 + Step 4.1 Bonus."* The required **Step 4 Evaluation (10 pts)** content exists (it's in §5 and §6) but isn't labelled as Step 4, so a grader may not map it to the rubric.
 - **Fix:** rename §5 (and the Step-4 parts of §6) to explicitly say "Step 4: Evaluation," or add a one-line rubric map in the executive summary ("Step 4 evaluation = §5 + §6.4–6.10").
@@ -83,7 +87,8 @@ Read-only audit of the project + reports for severe logic/faithfulness errors, r
 
 ## P2 — Minor (polish / clarity)
 
-### P2-1. Failure taxonomy is multi-label but report never says so
+### P2-1. Failure taxonomy is multi-label but report never says so — **DONE**
+- **STATUS: DONE** — added one sentence under the Section 1.4 table: "These labels are non-exclusive: a single query can show more than one failure mode, so the counts add up to 29 rather than the 24 queries evaluated." (Verified the table counts 10/8/5/4/1/1 = 29.)
 - **[impact: Step1=15]** **[effort: quick]**
 - Counts sum to **29 across 24 queries** because the Step 1 code assigns *multiple* labels per query (verified; counts 10/8/5/4/1/1 match the saved notebook output exactly). A grader may read 29>24 as an error.
 - **Fix:** add one sentence to §1.4: "labels are non-exclusive; a query may exhibit multiple failure modes, so counts sum to more than 24." (The code can also emit `grounding_failure`/`ambiguity_failure`; both scored 0 here — fine to omit.)
