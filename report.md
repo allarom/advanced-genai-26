@@ -558,20 +558,23 @@ We compute reliability-focused metrics for the full system on the 24 evaluation 
 
 ### 6.10 Challenge Set
 
-The 10 challenging queries defined in Phase 2 test specific reliability behaviors: ambiguous queries, insufficient evidence, conflicting evidence, and off-topic questions.
+The challenge set has 12 queries (run on the plain system, no memory cache) across five reliability categories: ambiguous (expect clarify), insufficient evidence (expect abstain), conflicting evidence (expect abstain), adversarial/off-topic (expect abstain), and standard (expect answer).
 
-**Challenge query results (warm memory, 10 queries):**
+**Challenge query results (plain system, 12 queries):**
 
-| Challenge type | Count | Result | Notes |
-|--------------|-------|--------|-------|
-| Ambiguous | 2 | 2/2 correct | Clarified |
-| Insufficient evidence | 3 | 3/3 correct | Abstained |
-| Conflicting evidence | 2 | 2/2 correct | Contradiction detected, abstained |
-| Off-topic | 3 | 3/3 correct | Abstained |
+| Challenge type | Count | Expected | Correct | Notes |
+|-------------------------|-------|----------|---------|------------------------------------------------|
+| Ambiguous | 2 | clarify | 2/2 | Both clarified |
+| Insufficient evidence | 2 | abstain | 1/2 | One abstained; "ETH robotics 1999" was answered |
+| Conflicting evidence | 2 | abstain | 0/2 | Both answered --- keyword contradiction did not fire |
+| Adversarial / off-topic | 2 | abstain | 2/2 | Both abstained |
+| Standard | 4 | answer | 4/4 | All answered |
 
-**Takeaway:** The system correctly abstains on all 10 challenge queries. No false abstentions (answering when it should not) and no false answers (answering incorrectly).
+Aggregate reliability metrics on this set: **correct abstention 3/6, false abstention 0/4, clarification 2/2**. The system behaved correctly on 9 of 12 queries.
 
-The results show modest but real gains from learning. They also reveal where the system remains coarse.
+**Takeaway:** The system handles ambiguous, adversarial, and standard queries correctly, and never falsely abstains on an answerable query (0/4). Its weak point is conflicting evidence: both conflicting queries ("Did ETH's student numbers go up or down in 2015?" and "Is ETH bigger or smaller than EPFL in staff count?") were answered instead of abstained. The keyword-based ContradictionAgent only fires when opposing terms appear literally in the retrieved passages, so a comparison phrased in the query but not contradicted in the evidence slips through. This is the §7 limitation in practice, and it motivates semantic (NLI-based) contradiction detection.
+
+The results also show where the system remains coarse, which the next section examines.
 
 
 ## 7. Limitations & Future Work
@@ -616,7 +619,7 @@ The data identifies a single most important agent: **ContradictionAgent**. Remov
 
 **Did abstention truly improve the system?**
 
-Yes for reliability, no for coverage. The 37.5% abstention rate with 100% challenge-set accuracy means the system correctly says "I don't know" when it should. But MRR did not improve: the system still retrieves the same documents; it just refuses to answer from them more often. Abstention is a reliability feature, not a retrieval upgrade.
+Yes for reliability, no for coverage. The 37.5% abstention rate, with zero false abstentions on the challenge set (0/4), means the system reliably says "I don't know" on unanswerable queries --- though it still over-answers conflicting-evidence cases (§6.10). But MRR did not improve: the system still retrieves the same documents; it just refuses to answer from them more often. Abstention is a reliability feature, not a retrieval upgrade.
 
 **Did adaptation (memory) truly improve the system?**
 
@@ -635,10 +638,10 @@ The 22% average speedup hides wide variation: queries with recovery see 37-58% g
 
 | Dimension | What we gained | What we gave up |
 |-----------|---------------|-----------------|
-| **Reliability vs. coverage** | Zero false positives on challenge set; 0.45 trust gap | 37.5% abstention rate; users get "I don't know" more often |
+| **Reliability vs. coverage** | Zero false abstentions on challenge set (0/4); 0.45 trust gap | 37.5% abstention rate; users get "I don't know" more often |
 | **Speed vs. accuracy** | 22-27% faster after learning (up to 58% on some queries) | MRR unchanged; memory does not improve retrieval |
 | **Simplicity vs. sophistication** | Deterministic heuristics, debuggable traces, fast iteration | Keyword contradiction misses semantic conflicts; 30% overlap is a proxy |
-| **Abstention vs. helpfulness** | Safe abstention on uncertain queries; 100% challenge-set accuracy | May frustrate users who expected an attempt; 3 queries could have been recovered |
+| **Abstention vs. helpfulness** | Safe abstention on adversarial and insufficient queries; 9/12 correct on the challenge set | May frustrate users who expected an attempt; 3 unanswerable queries were answered instead of abstained |
 | **Learning vs. data** | Memory adapts to feedback without retraining | Needs more than 10 samples per condition; cache useless on unique queries |
 
 
@@ -648,7 +651,7 @@ We built a system that separates **retrieval** (produces candidates) from **reli
 
 **What the results prove.**
 
-The reliability layer is calibrated. A 0.45 trust gap (0.608 for answered queries vs 0.158 for abstained) with zero overlap between the two groups shows the threshold cleanly separates reliable from unreliable answers. On the 10-query challenge set, the system abstains correctly 100% of the time: no false abstentions, no false answers.
+The reliability layer is calibrated. A 0.45 trust gap (0.608 for answered queries vs 0.158 for abstained) with zero overlap between the two groups shows the threshold cleanly separates reliable from unreliable answers. On the 12-query challenge set, the system abstains correctly on 3 of 6 unanswerable queries with no false abstentions (0/4); the misses are the two conflicting-evidence queries, where keyword contradiction did not fire (§6.10).
 
 The ablation study reveals which signals matter most. Removing the ContradictionAgent causes 9 false positives --- the single largest failure mode in the system. Removing the RecoveryAgent increases unnecessary abstentions from 9 to 12. These two agents together are responsible for the system's reliability. Trust scoring, ClarificationAgent, and GroundednessAgent provide supporting signals, but contradiction and recovery are the load-bearing mechanisms.
 
