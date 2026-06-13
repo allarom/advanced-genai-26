@@ -579,35 +579,35 @@ The results also show where the system remains coarse, which the next section ex
 
 ## 7. Limitations & Future Work
 
-### Evidence Sufficiency
+### 7.1 Evidence Sufficiency
 - **Current:** Token overlap between query and top-5 docs.
 - **Upgrade:** Semantic coverage scoring or LLM-based assessment.
 
-### Groundedness
+### 7.2 Groundedness
 - **Current:** 20% single-document token overlap.
 - **Upgrade:** NLI (Natural Language Inference) model for entailment.
 
-### Contradiction Detection
+### 7.3 Contradiction Detection
 - **Current:** Keyword-pair matching (`yes/no`, `increase/decrease`) and year conflict.
 - **Upgrade:** LLM-based semantic contradiction detection.
 
-### Trust Scoring
+### 7.4 Trust Scoring
 - **Current:** Hand-tuned linear formula `0.6*s + 0.3*g - 0.4*c`.
 - **Upgrade:** Calibration on labeled data or learned weights.
 
-### Memory & Learning
+### 7.5 Memory & Learning
 - **Current:** Counter-based strategy selection and equal nudge on all retriever weights.
 - **Upgrade:** Contextual bandit for strategy selection; per-retriever provenance tracking for precise credit assignment.
 
-### Clarification
+### 7.6 Clarification
 - **Current:** Pronoun and length heuristic.
 - **Upgrade:** LLM for entity disambiguation and intent clarification.
 
-### Answer Generation
+### 7.7 Answer Generation
 - **Current:** Orchestrator's extractive synthesizer or first-doc truncation.
 - **Upgrade:** Full generative LLM with grounding constraints.
 
-### Critical Reflection
+### 7.8 Critical Reflection
 
 **Which mechanisms were most useful?**
 
@@ -634,7 +634,7 @@ The 22% average speedup hides wide variation: queries with recovery see 37-58% g
 3. **10 feedback samples per condition** is too few for robust per-type strategy learning. Entity_temporal has only 2 samples total.
 4. **Automated feedback uses a 30% token-overlap proxy**, not human judgment. A correct answer phrased differently from the gold would be marked "bad."
 
-### Tradeoffs
+### 7.9 Tradeoffs
 
 | Dimension | What we gained | What we gave up |
 |-----------|---------------|-----------------|
@@ -698,6 +698,7 @@ advanced-genai-26/
 \-- report.md                         # This report
 ```
 
+\newpage
 
 ## Appendix B: Generative AI Usage Declaration
 

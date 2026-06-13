@@ -96,7 +96,7 @@ This is where "good analysis, not blah blah" lives. Target the biggest marks.
 - E4. **Five required qualitative cases** (§5.2) — explicitly label: (1) grounded answer, (2) revised-after-critique = a recovery-success keyword query, (3) clarification, (4) abstention, (5) **hard failure = a conflicting query that was answered** (use the real failure from P0-0 — strong, honest analysis).
 - E5. **Figures:** embed the unused screenshots that add evidence (`01_benchmark_table.png`, `03_decision_counts.png`, `memory_sys_working.png` — all exist) near the matching tables. They auto-number as "Figure N" via the configured `caption` package, so just add `![caption](path)` on its own line.
 - E6. **One-liners:** note the failure taxonomy is multi-label (counts overlap); note QID-1 exclusion (CSVs start at QID 2; 24 queries) with a one-sentence reason.
-- E7. **Heading-numbering consistency (render):** §1–§6 use manual numbers (`## 1.`, `### 1.1`) but **§7's subsections are unnumbered** (`### Evidence Sufficiency` …). Pick ONE: number them `### 7.1 … 7.8` to match, or leave intentionally unnumbered — just be consistent. (Keep the build's `number_sections: false`; manual numbers are already in the text, so auto-numbering would double them.)
+- E7. **Heading-numbering consistency (render):** **[DONE]** numbered §7 subsections `7.1`–`7.9` to match §1–§6's manual numbering; verified consistent in the rendered PDF. (Build keeps `number_sections: false`, so no doubling.)
 - E8. **Requirement-coverage pass:** quickly confirm each graded requirement is *visibly* answered — Step 1 (baseline reproduce + taxonomy + efficiency), Step 2 (multi-agent design + strategies), Step 3 (mechanisms A–H + decision policy + adaptation), Step 4 (evaluation vs baseline + ablation + reliability metrics + benchmark extension), Step 5 (limitations / what didn't work + why), and the Step 4.1 bonus. The honest §6.10 failure now strengthens Step 5.
 - E9. **Individual contributions (rubric-required):** add a short "Contributions" subsection (or appendix line) stating what each group member did — design, implementation, experiments, analysis, writing. If solo, state that explicitly. Do not skip; it's an explicit submission requirement.
 - E10. **References (Step-5 professionalism):** add a short References section citing the external methods actually used — BM25, Reciprocal Rank Fusion, `multilingual-e5-large-instruct`, the `ms-marco-MiniLM` cross-encoder, GraphRAG, and any papers/repos. Do NOT cite `pytrec_eval` as used (it isn't — see C4).
@@ -114,13 +114,10 @@ This is where "good analysis, not blah blah" lives. Target the biggest marks.
 - **Frontmatter is solid:** YAML sets `geometry: margin=2.5cm`, `fontsize: 10pt`, `onehalfspacing`, `times`, `booktabs`, `titlesec`, and a `caption` setup. ASCII diagrams are correctly scoped `\footnotesize … \normalsize` (6 paired, **no font leak**). The widest source lines are all **prose** (they wrap automatically) — no horizontal overflow from text. `\newpage` already precedes Appendix A.
 - **So the format is largely clean already** — the remaining render work is small and targeted (below).
 
-## Phase G — LAST: render fixes + rebuild + eyeball PDFs [P0-1]
-Do this only after ALL content edits land.
-- G1. **Two small pre-build fixes:**
-  - Add `\newpage` before `## Appendix B` (line ~699) — currently only Appendix A starts on a new page.
-  - Rename `archived_documents/screenshots/manual and auto feedback compare.png` → `manual_and_auto_feedback_compare.png` and update the reference at report.md line ~508 (the current `%20`-encoded path is a render hazard on some engines).
-- G2. **Build with the same toolchain + correct flags:** LaTeX engine (`--pdf-engine=xelatex` is safest with `\usepackage{times}`), **do NOT pass `--number-sections`** (manual numbers exist), keep `fig_caption` on. Build BOTH `report.pdf` and `baseline_repro_report.pdf`.
-- G3. **Visual QA checklist (eyeball the rendered PDF):**
+## Phase G — LAST: render fixes + rebuild + eyeball PDFs [P0-1] — **DONE (rebuilt this round; re-run after further edits)**
+- G1. **Two small pre-build fixes:** **[DONE]** added `\newpage` before `## Appendix B`. **[N/A]** the `%20` image (`manual and auto feedback compare.png`) was *not* renamed — it already renders correctly as Figure 3 in both pandoc/xelatex and rmarkdown/pdflatex (verified visually), so no rename was needed.
+- G2. **Build:** **[DONE]** built BOTH PDFs via `Rscript scripts/build_reports.R` = the RStudio `rmarkdown::render` path (pdflatex, `number_sections` off, `fig_caption` on). No errors, only a harmless `--highlight-style` deprecation warning.
+- G3. **Visual QA checklist (eyeball the rendered PDF):** **[DONE]** verified on rendered pages.
   - Section numbers read cleanly (no "1 1." doubling); §7 numbering matches the E7 decision.
   - Each ASCII diagram (lines 51/130/173/235/298/420) fits within the right margin and isn't clipped; text after each returns to normal size.
   - Every table (esp. the 24-query benchmark, ablation, challenge) fits page width and doesn't split awkwardly — if any overflows, wrap it in `\small{}` or add a `{tabular}` column spec / `\resizebox`.
