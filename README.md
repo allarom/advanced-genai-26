@@ -2,6 +2,7 @@
 
 **Course:** Advanced Generative AI Capstone  
 **Institution:** HSLU Applied Information and Data Science
+Dongyuan Gao, Julia Studer, Alla Roman
 
 ---
 
@@ -12,6 +13,17 @@ This repository implements a **multi-agent Retrieval-Augmented Generation (RAG) 
 ```
 User Query --> Clarify? --> Retrieve --> Check Signals --> Trust Score --> [Recover if low] --> Answer / Abstain
 ```
+
+---
+
+## Open in Google Colab
+
+| Step | Notebook |
+|------|----------|
+| Step 1 — Baseline and Failure Analysis | [Open in Colab](https://colab.research.google.com/github/allarom/advanced-genai-26/blob/main/Step_1_Baseline_and_Failure_Analysis.ipynb) |
+| Step 2 — Reliability-Aware Design | [Open in Colab](https://colab.research.google.com/github/allarom/advanced-genai-26/blob/main/Step_2_Reliability_Aware_Design.ipynb) |
+| Step 3 — Reliable Adaptive Agentic RAG | [Open in Colab](https://colab.research.google.com/github/allarom/advanced-genai-26/blob/main/Step_3_Reliable_Adaptive_Agentic_RAG.ipynb) |
+| Step 4 — Evaluation | [Open in Colab](https://colab.research.google.com/github/allarom/advanced-genai-26/blob/main/Step_4_Evaluation.ipynb) |
 
 ---
 
@@ -39,6 +51,7 @@ User Query --> Clarify? --> Retrieve --> Check Signals --> Trust Score --> [Reco
 ## Quick Start
 
 ### 1. Setup
+If you want to run it locally
 
 ```bash
 # Install dependencies
@@ -57,7 +70,7 @@ Open `Step_1_Baseline_and_Failure_Analysis.ipynb` in Google Colab or Jupyter.
 
 Open `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb`.
 - The setup cells make `legacy_retrieval_engine.py` available.
-- The retrieval wrappers are imported from `legacy_retrieval_engine.py`; unrelated notebook cells are not executed.
+- The retrieval wrappers are imported from `legacy_retrieval_engine.py`;
 - Run agent definition cells (5.1--5.8).
 - Run the main `ReliableAdaptiveRAG` class cell.
 - Test with:
