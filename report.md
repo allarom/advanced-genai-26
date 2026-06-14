@@ -25,11 +25,27 @@ header-includes:
 lang: "en-GB"
 ---
 
-# Reliable Adaptive Agentic RAG System
-## Steps 1-4 + Step 4.1 Bonus | Advanced Generative AI Capstone
+\begin{titlepage}
+\centering
+\vspace*{3cm}
 
-**Date:** May 2026 (Step 3 benchmark: 29 May 2026)
+{\LARGE\bfseries Reliable Adaptive Agentic RAG System\par}
+\vspace{1.2cm}
 
+{\large Advanced Generative AI --- Capstone Project\par}
+\vspace{0.3cm}
+{\normalsize HSLU Applied Data Science \& AI Master's Program\par}
+\vspace{2.5cm}
+
+{\large\bfseries Project Participants\par}
+\vspace{0.5cm}
+{\large Alla Roman \qquad Dongyuan Gao \qquad Julia Studer\par}
+\vspace{2.5cm}
+
+{\large May 2026\par}
+
+\vfill
+\end{titlepage}
 
 ## Executive Summary
 
@@ -722,3 +738,13 @@ This report and the accompanying code documentation were developed with assistan
 - **Documentation drafting**: Structuring and writing this report and the README.md based on the actual codebase.
 - **Brainstorming**: Discussing trade-offs (heuristics vs. LLMs, agent separation vs. merging, ablation defaults, composition vs. inheritance for memory injection).
 All code changes were reviewed and accepted by the authors. The AI did not have access to private data or external APIs beyond the project's own files. The core algorithms, design decisions, and evaluation results are the authors' own work.
+
+\newpage
+
+## Appendix C: Contributions
+
+| Member | Main contributions |
+|--------|--------------------|
+| **Alla Roman** | Baseline reproduction (Step 1), baseline improvement, multi-agent orchestration (Step 2), report |
+| **Dongyuan Gao** | Reliability-aware improvement, extra challenges (Step 4.1: memory and human-in-the-loop), report |
+| **Julia Studer** | Reliable adaptive agent implementation (Step 3) |
