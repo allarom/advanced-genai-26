@@ -17,18 +17,22 @@ User Query --> Clarify? --> Retrieve --> Check Signals --> Trust Score --> [Reco
 
 ## Repository Structure
 
-| File | Purpose |
+| Path | Purpose |
 |------|---------|
-| `multi-agent-step-2_strategy-A.ipynb` | Legacy Step 2: retrieval engine (Confidence/Waterfall/Voting) |
-| `Step_2_Reliability_Aware_Design.ipynb` | Design doc: architecture, signals, decision policy, trace schema |
-| `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb` | Implementation: 8 reliability agents + `ReliableAdaptiveRAG` |
-| `Step_4_1_extra_challenges.ipynb` | Bonus: memory-based adaptation + human-in-the-loop |
-| `Step_4_Evaluation.ipynb` | 9-phase evaluation: cold vs warm memory, HITL feedback, ablation |
-| `Step_1_Baseline_and_Failure_Analysis.ipynb` | Baseline reproduction and failure analysis |
-| `baseline_repro_report.md` | Baseline evaluation results |
-| `report.md` | Full project report with diagrams and analysis |
-| `scripts/` | Patch utilities and test scripts |
-| `memory/` | Persisted learned weights and verified answers |
+| `Step_1_Baseline_and_Failure_Analysis.ipynb` | Baseline reproduction, full-corpus retrieval evaluation, answer synthesis, and failure analysis |
+| `multi-agent-step-2_strategy-A.ipynb` | Legacy Step 2 retrieval engine with Confidence, Waterfall, and Voting orchestration |
+| `Step_2_Reliability_Aware_Design.ipynb` | Reliability-aware design: architecture, signals, decision policy, and trace schema |
+| `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb` | Implementation of reliability agents and `ReliableAdaptiveRAG` |
+| `Step_4_Evaluation.ipynb` | Evaluation framework: baseline, cold/warm memory, HITL feedback, ablation, reliability metrics, and challenge queries |
+| `Step_4_1_extra_challenges.ipynb` | Bonus memory-based adaptation and human-in-the-loop feedback interface |
+| `report.md` | Source markdown for the final project report |
+| `baseline_repro_report.md` | Source markdown for the baseline reproduction report |
+| `reports/` | Generated report PDFs, including `report.pdf` and `baseline_repro_report.pdf` |
+| `scripts/build_reports.R` | R Markdown build script that renders report PDFs into `reports/` |
+| `scripts/` | Supporting utilities for notebook/report maintenance |
+| `memory/` | Persisted learned weights, verified answers, and evaluation CSV outputs |
+| `baseline/` | Reference materials and inherited baseline work from the previous project |
+| `archived_documents/` | Archived supporting documents, screenshots, and audit notes from the project process |
 
 ---
 
@@ -88,6 +92,14 @@ feedback_ui("Who received ERC grants at ETH?")
 ```
 
 - **Evaluation:** `Step_4_Evaluation.ipynb` runs a 9-phase framework (baseline → cold → HITL feedback → warm re-eval → comparison → ablation → reliability metrics → challenge queries → qualitative analysis). Results are saved to `memory/csv_outputs/`.
+
+### 6. Build reports
+
+Generated report PDFs are written to `reports/`:
+
+```bash
+Rscript scripts/build_reports.R
+```
 
 ---
 
