@@ -270,19 +270,20 @@ With the architecture defined, we now turn to implementation: building each agen
 
 ### 4.1 How the legacy engine is reused
 
-The reliability layer does **not** rewrite retrieval. It loads the legacy Step 2 notebook via `%run` and wraps its orchestrator classes:
+The reliability layer does **not** rewrite retrieval. It imports the reusable baseline retrieval helpers from `legacy_retrieval_engine.py`, using only the functionality Step 3 needs: Confidence, Waterfall, and Voting orchestration.
 
 ```python
-%run multi-agent-step-2_strategy-A.ipynb
-
-def confidence_orchestrate(query, top_k=5):
-    answer, docs, trace = orchestrator.run(query, top_k=top_k)
-    return answer, docs, trace
+from legacy_retrieval_engine import (
+    confidence_orchestrate,
+    waterfall_orchestrate,
+    voting_orchestrate,
+)
 ```
 
 This ensures three properties:
 
-- **No regression**: Proven retrieval pipeline stays intact.
+- **No regression**: The retrieval/orchestration behavior from the legacy work stays intact.
+- **Cleaner execution**: Step 3 no longer executes unrelated evaluation and demo cells from the old notebook.
 - **Modular testing**: Baseline and reliability-augmented runs are side-by-side comparable.
 - **Clear ablation**: `ReliableAdaptiveRAG(ablate=["groundedness"])` disables checks individually.
 
@@ -505,10 +506,12 @@ After populating memory with 10 feedback questions, we re-run the 24 benchmark q
 |---|---|---|---|---|---|
 | semantic | 9 | 0.767 | 0.319 | 0.449 | **58.5%** |
 | semantic | 10 | 0.746 | 0.350 | 0.396 | **53.1%** |
-| entity | 8 | 0.384 | 0.188 | 0.196 | **51.1%** |
+| mixed | 11 | 0.693 | 0.406 | 0.287 | **41.4%** |
 | keyword | 5 | 0.583 | 0.363 | 0.220 | **37.7%** |
-| keyword | 13 | 0.204 | 0.198 | 0.007 | 3.3% |
-| semantic | 24 | 0.260 | 0.257 | 0.003 | 1.0% |
+| entity | 8 | 0.384 | 0.188 | 0.196 | **51.1%** |
+| entity | 7 | 0.387 | 0.198 | 0.189 | **48.9%** |
+| entity | 3 | 0.493 | 0.381 | 0.112 | **22.7%** |
+| keyword | 4 | 0.470 | 0.380 | 0.090 | 19.2% |
 | semantic | 18 | 0.377 | 0.498 | -0.121 | **-32.2%** |
 | semantic | 19 | 0.189 | 0.269 | -0.081 | **-42.8%** |
 
@@ -691,7 +694,7 @@ Retrieval is necessary but not sufficient. Reliability judgment is necessary but
 advanced-genai-26/
 |-- baseline_repro_report.md          # Step 1 baseline results
 |-- Step_1_Baseline_and_Failure_Analysis.ipynb
-|-- multi-agent-step-2_strategy-A.ipynb   # Legacy Step 2 (retrieval engine)
+|-- legacy_retrieval_engine.py        # Clean reusable retrieval engine for Step 3
 |-- Step_2_Reliability_Aware_Design.ipynb   # New Step 2 (design document)
 |-- Step_3_Reliable_Adaptive_Agentic_RAG.ipynb  # Step 3 (implementation)
 |-- Step_4_1_extra_challenges.ipynb         # Step 4.1 bonus (memory + HITL)

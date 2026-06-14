@@ -24,7 +24,7 @@ for cell in nb["cells"]:
                 cell["source"].insert(
                     i + 2,
                     "5. **Known gap — answer synthesis**: The current Step 3 prototype uses a simplified answer generator (`docs[0].page_content[:250]`). "
-                    "The production implementation will use the full `AnswerSynthesizerAgent` from `multi-agent-step-2_strategy-A.ipynb`.\n"
+                    "The production implementation will use the full `AnswerSynthesizerAgent` from `legacy_retrieval_engine.py`.\n"
                 )
                 break
         break
@@ -69,7 +69,7 @@ for idx, cell in enumerate(nb["cells"]):
                 "\n",
                 "### Code reuse\n",
                 "\n",
-                "- **Step 3 loads strategy-A** via `%run multi-agent-step-2_strategy-A.ipynb`.\n",
+                "- **Step 3 imports baseline retrieval helpers** from `legacy_retrieval_engine.py`.\n",
                 "- The orchestrators (`ConfidenceOrchestrator`, `WaterfallOrchestrator`, `VotingOrchestrator`) are reused unchanged.\n",
                 "- The answer synthesizer will be reused once the placeholder in Step 3 is replaced (see §2.1, principle 5).\n",
                 "- All reliability agents are **new** and live in `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb`.\n",
