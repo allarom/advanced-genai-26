@@ -2,6 +2,7 @@
 
 **Course:** Advanced Generative AI Capstone  
 **Institution:** HSLU Applied Information and Data Science
+
 Dongyuan Gao, Julia Studer, Alla Roman
 
 ---
