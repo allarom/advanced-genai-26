@@ -96,7 +96,7 @@ Currently it's a code snippet placeholder. After Phase B6b, fill in a table:
 cd ~/Desktop/advanced-genai-26
 git add Step_4_1_extra_challenges.ipynb Step_4_Evaluation.ipynb scripts/build_step4_notebook.py
 git commit -m "update: Colab setup + sections 7-11 for 4_1"
-git push origin dongy
+git push origin main
 ```
 
 > **Why:** The Colab setup cell clones from GitHub. If you don't push, Colab runs the old code.
@@ -114,7 +114,7 @@ This mounts Drive, clones repo, installs packages, changes directory.
 **Wait for it to finish** (~2 minutes). You should see:
 ```
 CWD: /content/advanced-genai-26
-dongy
+main
 ```
 
 #### B3. Run Cell 2 (Load Step 4.1)
