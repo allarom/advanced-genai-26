@@ -1,0 +1,206 @@
+{
+  "verified_answers": {
+    "2012 bernays founded lectures paul series": {
+      "query": "Who founded the Paul Bernays Lectures series in 2012?",
+      "answer": "the series was founded in 2012 by professor giovanni sommaruga (d-gess). **paul bernays lectures 2021** **prof. paul bernays lectures 2022 on artificial intelligence and mathematics: the paul bernays lectures are an annual lecture series about the philosophy of the exact sciences.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:05"
+    },
+    "appointed assistant eth glaciology professor tenure track zurich": {
+      "query": "Who was appointed tenure track assistant professor of glaciology at ETH Zurich?",
+      "answer": "stefan feuerriegel joined eth zurich in 2017 as a tenure track assistant professor. eight professors appointed at eth zurich: **dr daniel farinotti (*1982)**, currently a senior scientific staff member at wsl in birmensdorf, as tenure track assistant professor of glaciology. these results\n\neight professors appointed at eth zurich: research fellow at durham university, uk, as tenure track assistant professor of theoretical molecular quantum dynamics.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:05"
+    },
+    "2010 been crop eth full has professor science since zurich": {
+      "query": "Who has been a full professor of crop science at ETH Zurich since 2010?",
+      "answer": "Achim Walter",
+      "source": "human",
+      "ts": "2026-06-03 14:16:06"
+    },
+    "corporate eth knowledge president relations transfer vice zurich": {
+      "query": "Who is the vice president for knowledge transfer and corporate relations at ETH Zurich?",
+      "answer": "vanessa wood has been vice president for [knowledge transfer and corporate relations](/en/the-eth-zurich/organisation/executive-board/vice-president-corporate-relations.html) at eth zurich since 2021. what is your reaction as eth vice president research and corporate relations? the two new vice presidencies, \"personnel development and leadership\" and \"knowledge transfer and corporate relations\", were created from the existing executive board domains in january 2020 and led ad interim by ulrich weidmann and detlef günther.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:06"
+    },
+    "approach co-developed conflict eth mediation peace researcher": {
+      "query": "Who is the ETH peace researcher who co-developed a conflict mediation approach?",
+      "answer": "this principle lies at the heart of an innovative approach to conflict mediation developed by the late kenyan mediator dekha ibrahim abdi and eth peace researcher simon mason. conflict mediation podcast: many small, local steps may lead more effectively to peace than big dreams of a perfect state. please note that the master of advanced studies eth mediation in peace processes reserves the right to make changes in the composition of the panel.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:06"
+    },
+    "appointed barba eth position rosa zurich": {
+      "query": "What position was Rosa Barba appointed to at ETH Zurich?",
+      "answer": "the appointment of alexander stremitzer reinforces the international position of the center for law &amp; economics at eth zurich. eth zurich has appointed her with a view to enhancing its leading role in experimental high-energy physics. nine professors appointed: **dr elsa abreu** (*1984), currently senior researcher at eth zurich, as assistant professor of physics in the department of physics.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:06"
+    },
+    "became conference eth lecturers president": {
+      "query": "Who became president of the ETH lecturers' conference?",
+      "answer": "the lecturers conference has a new president: **an engineer with a flair for medicine** edoardo mazza has been teaching and researching at eth zurich since 2002. edoardo mazza has been a member of the lecturers' conference since 2014 and a member of the [eth zurich teaching commission](/en/die-eth-zuerich/organisation-copy/gremien-gruppen-kommissionen/lehrkommission.html) since 2015. in may 2023, pilloud was elected president of the eth alumni association on an honorary basis.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:06"
+    },
+    "department eth meboldt mirko professor zurich": {
+      "query": "Which department is Mirko Meboldt a professor in at ETH Zurich?",
+      "answer": "**professor joaquim serra** (*1986), currently assistant professor at eth zurich, as associate professor of mathematics in the department of mathematics. mirko meboldt, a professor in the department of mechanical and process engineering, has been organising the innovation project for four years now. **professor bruno studer** (*1977), currently associate professor at eth zurich, as full professor of molecular plant breeding in the department of environmental systems science.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:07"
+    },
+    "chip developed embryo eth group new placenta professor testing toxicity whose": {
+      "query": "Who is the ETH professor whose group developed a new chip for testing toxicity on the placenta and embryo?",
+      "answer": "to do so, julia boos, a doctoral student in the group of eth professor andreas hierlemann, and her colleagues developed a new chip. toxicity testing on the placenta and embryo: a chip with different cell types researchers in the department of biosystems science and engineering at eth zurich in basel have now devised a laboratory test that incorporates the role of the placenta into embryotoxicity assessments. advanced biology, june 19\n\ntoxicity testing on the placenta and embryo: , furer la, aengenheister l, modena m, rousset m, buerki-thurnherr t, hierlemann a: microfluidic co-culture platform to recapitulate the maternal-placental-embryonic axis.",
+      "source": "human",
+      "ts": "2026-06-03 14:16:07"
+    },
+    "group leader meboldt's mirko peakboil project project": {
+      "query": "Who is the project leader of the PeakBoil project in Mirko Meboldt's group?",
+      "answer": "\"this increases the contact area between the flame and the jug,\" explains julian ferchow, the project leader and a doctoral student in eth professor mirko meboldt's group. mirko meboldt, a professor in the department of mechanical and process engineering, has been organising the innovation project for four years now. they call their kettle \"peakboil\".",
+      "source": "human",
+      "ts": "2026-06-03 14:16:07"
+    }
+  },
+  "strategy_stats": {
+    "entity_temporal": {
+      "confidence": {
+        "success": 1,
+        "fail": 1
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "entity": {
+      "confidence": {
+        "success": 6,
+        "fail": 0
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "semantic": {
+      "confidence": {
+        "success": 1,
+        "fail": 0
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    },
+    "keyword": {
+      "confidence": {
+        "success": 1,
+        "fail": 0
+      },
+      "waterfall": {
+        "success": 0,
+        "fail": 0
+      },
+      "voting": {
+        "success": 0,
+        "fail": 0
+      }
+    }
+  },
+  "weight_memory": {
+    "entity_temporal": {
+      "bm25": 0.7,
+      "dense": 1.1,
+      "graph": 1.4
+    },
+    "entity": {
+      "bm25": 1.5,
+      "dense": 1.6,
+      "graph": 1.6
+    },
+    "semantic": {
+      "bm25": 0.9,
+      "dense": 1.5,
+      "graph": 1.0
+    },
+    "keyword": {
+      "bm25": 1.4,
+      "dense": 1.2,
+      "graph": 0.8
+    }
+  },
+  "failure_log": [
+    {
+      "query": "Who has been a full professor of crop science at ETH Zurich since 2010?",
+      "query_type": "entity_temporal",
+      "reason": "overlap=False",
+      "ts": "2026-06-03 14:16:06"
+    },
+    {
+      "query": "who at eth received erc grants?",
+      "query_type": "entity",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:19"
+    },
+    {
+      "query": "when did the insight get to mars?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:20"
+    },
+    {
+      "query": "what did prof. schubert say about flying?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:20"
+    },
+    {
+      "query": "how do alpine plants respond to climate change?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:22"
+    },
+    {
+      "query": "how would you make ferzlizer without carbon emissions?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:22"
+    },
+    {
+      "query": "what research is eth famous for?",
+      "query_type": "mixed",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:23"
+    },
+    {
+      "query": "what conneczons does eth have to hong kong?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:25"
+    },
+    {
+      "query": "why should eth receive any additional funding?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:27"
+    },
+    {
+      "query": "does eth organize any competitions?",
+      "query_type": "mixed",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:29"
+    }
+  ]
+}

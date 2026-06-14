@@ -1,0 +1,61 @@
+{
+  "verified_answers": {},
+  "strategy_stats": {},
+  "weight_memory": {},
+  "failure_log": [
+    {
+      "query": "who at eth received erc grants?",
+      "query_type": "entity",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:15:50"
+    },
+    {
+      "query": "when did the insight get to mars?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:15:50"
+    },
+    {
+      "query": "what did prof. schubert say about flying?",
+      "query_type": "keyword",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:15:51"
+    },
+    {
+      "query": "how do alpine plants respond to climate change?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:15:54"
+    },
+    {
+      "query": "how would you make ferzlizer without carbon emissions?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:15:55"
+    },
+    {
+      "query": "what research is eth famous for?",
+      "query_type": "mixed",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:15:56"
+    },
+    {
+      "query": "what conneczons does eth have to hong kong?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:15:59"
+    },
+    {
+      "query": "why should eth receive any additional funding?",
+      "query_type": "semantic",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:02"
+    },
+    {
+      "query": "does eth organize any competitions?",
+      "query_type": "mixed",
+      "reason": "contradiction",
+      "ts": "2026-06-03 14:16:03"
+    }
+  ]
+}
