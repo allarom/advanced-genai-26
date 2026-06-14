@@ -20,7 +20,7 @@ User Query --> Clarify? --> Retrieve --> Check Signals --> Trust Score --> [Reco
 | Path | Purpose |
 |------|---------|
 | `Step_1_Baseline_and_Failure_Analysis.ipynb` | Baseline reproduction, full-corpus retrieval evaluation, answer synthesis, and failure analysis |
-| `multi-agent-step-2_strategy-A.ipynb` | Legacy Step 2 retrieval engine with Confidence, Waterfall, and Voting orchestration |
+| `legacy_retrieval_engine.py` | Clean reusable retrieval engine used by Step 3; exposes Confidence, Waterfall, and Voting orchestration |
 | `Step_2_Reliability_Aware_Design.ipynb` | Reliability-aware design: architecture, signals, decision policy, and trace schema |
 | `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb` | Implementation of reliability agents and `ReliableAdaptiveRAG` |
 | `Step_4_Evaluation.ipynb` | Evaluation framework: baseline, cold/warm memory, HITL feedback, ablation, reliability metrics, and challenge queries |
@@ -48,15 +48,16 @@ pip install pandas numpy transformers accelerate
 
 ### 2. Run baseline (Step 1 / Step 2 legacy)
 
-Open `multi-agent-step-2_strategy-A.ipynb` in Google Colab or Jupyter.
+Open `Step_1_Baseline_and_Failure_Analysis.ipynb` in Google Colab or Jupyter.
 - Mount Google Drive with `benchmark/` and `storage/` data.
 - Set `HF_TOKEN` in Colab secrets (optional, for Hugging Face downloads).
-- Run all cells to reproduce baseline + orchestration results.
+- Run all cells to reproduce baseline retrieval, orchestration, answer synthesis, and failure analysis results.
 
 ### 3. Run reliability-augmented system (Step 3)
 
 Open `Step_3_Reliable_Adaptive_Agentic_RAG.ipynb`.
-- Cell 4 loads the legacy engine via `%run multi-agent-step-2_strategy-A.ipynb`.
+- The setup cells make `legacy_retrieval_engine.py` available.
+- The retrieval wrappers are imported from `legacy_retrieval_engine.py`; unrelated notebook cells are not executed.
 - Run agent definition cells (5.1--5.8).
 - Run the main `ReliableAdaptiveRAG` class cell.
 - Test with:

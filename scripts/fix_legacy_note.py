@@ -12,7 +12,7 @@ for cell in nb['cells']:
             if 'Reuse, don' in line:
                 cell['source'][i] = (
                     '1. **Reuse legacy code, do not rewrite**: The retrieval pipeline '
-                    'from the old project lives in `multi-agent-step-2_strategy-A.ipynb`. '
+                    'from the baseline reproduction lives in `legacy_retrieval_engine.py`. '
                     'It is loaded as an internal library (via `%run`) in Step 3. '
                     'It is **not** a deliverable in the current Step 1-4 workflow '
                     '-- it is background infrastructure we build on top of.\n'
