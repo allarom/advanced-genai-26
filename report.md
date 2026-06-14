@@ -42,7 +42,7 @@ lang: "en-GB"
 {\large Alla Roman \qquad Dongyuan Gao \qquad Julia Studer\par}
 \vspace{2.5cm}
 
-{\large May 2026\par}
+{\large June 2026\par}
 
 \vfill
 \end{titlepage}
